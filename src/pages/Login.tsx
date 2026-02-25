@@ -27,12 +27,15 @@ export function Login() {
         password,
       });
       const data = res.data;
-      const isValidRole = (r: string): r is UserRole => (USER_ROLES as readonly string[]).includes(r);
+      const rawRole = data.user.role as string;
+      if (!USER_ROLES.includes(rawRole as (typeof USER_ROLES)[number])) {
+        throw new Error("Resposta inválida: role desconhecido");
+      }
       const user: User = {
         personId: data.user.personId,
         username: data.user.username,
         fullName: data.user.fullName,
-        role: isValidRole(data.user.role) ? data.user.role : "worker",
+        role: rawRole as UserRole,
       };
       login(data.token, user);
       navigate(from, { replace: true });
