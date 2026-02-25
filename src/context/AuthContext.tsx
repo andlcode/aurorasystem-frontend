@@ -6,14 +6,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-import type { UserRole } from "../types/auth";
-
-interface User {
-  personId: string;
-  username: string;
-  role: UserRole;
-  fullName: string;
-}
+import type { User } from "../types/auth";
 
 interface AuthContextValue {
   user: User | null;

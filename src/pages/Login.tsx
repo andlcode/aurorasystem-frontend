@@ -1,7 +1,8 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
-import type { UserRole } from "../types/auth";
+import type { User, UserRole } from "../types/auth";
+import { USER_ROLES } from "../types/auth";
 import { api } from "../api/client";
 
 export function Login() {
@@ -21,11 +22,19 @@ export function Login() {
     setError(null);
     setLoading(true);
     try {
-      const res = await api.post<{ token: string; user: { personId: string; username: string; role: UserRole; fullName: string } }>("/auth/login", {
+      const res = await api.post<{ token: string; user: { personId: string; username: string; role: string; fullName: string } }>("/auth/login", {
         username: username.trim(),
         password,
       });
-      login(res.data.token, res.data.user);
+      const data = res.data;
+      const isValidRole = (r: string): r is UserRole => (USER_ROLES as readonly string[]).includes(r);
+      const user: User = {
+        personId: data.user.personId,
+        username: data.user.username,
+        fullName: data.user.fullName,
+        role: isValidRole(data.user.role) ? data.user.role : "worker",
+      };
+      login(data.token, user);
       navigate(from, { replace: true });
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Erro ao entrar";
