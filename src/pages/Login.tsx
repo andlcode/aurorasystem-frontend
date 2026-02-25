@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth, type UserRole } from "../context/AuthContext";
+import { useAuth } from "../context/AuthContext";
+import type { UserRole } from "../types/auth";
 import { api } from "../api/client";
 
 export function Login() {

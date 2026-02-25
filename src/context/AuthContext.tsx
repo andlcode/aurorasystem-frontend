@@ -6,8 +6,7 @@ import {
   useState,
   type ReactNode,
 } from "react";
-
-export type UserRole = "super_admin" | "admin" | "worker";
+import type { UserRole } from "../types/auth";
 
 interface User {
   personId: string;
