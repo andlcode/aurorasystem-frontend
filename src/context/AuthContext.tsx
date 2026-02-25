@@ -7,7 +7,7 @@ import {
   type ReactNode,
 } from "react";
 
-type UserRole = "super_admin" | "admin" | "worker";
+export type UserRole = "super_admin" | "admin" | "worker";
 
 interface User {
   personId: string;

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { useAuth, type UserRole } from "../context/AuthContext";
 import { api } from "../api/client";
 
 export function Login() {
@@ -24,7 +24,10 @@ export function Login() {
         username: username.trim(),
         password,
       });
-      login(res.data.token, res.data.user);
+      login(res.data.token, {
+        ...res.data.user,
+        role: res.data.user.role as UserRole,
+      });
       navigate(from, { replace: true });
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Erro ao entrar";
