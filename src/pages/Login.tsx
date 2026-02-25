@@ -21,14 +21,11 @@ export function Login() {
     setError(null);
     setLoading(true);
     try {
-      const res = await api.post<{ token: string; user: { personId: string; username: string; role: string; fullName: string } }>("/auth/login", {
+      const res = await api.post<{ token: string; user: { personId: string; username: string; role: UserRole; fullName: string } }>("/auth/login", {
         username: username.trim(),
         password,
       });
-      login(res.data.token, {
-        ...res.data.user,
-        role: res.data.user.role as UserRole,
-      });
+      login(res.data.token, res.data.user);
       navigate(from, { replace: true });
     } catch (err: unknown) {
       const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Erro ao entrar";
