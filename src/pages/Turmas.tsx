@@ -12,10 +12,10 @@ interface Class {
   time?: string;
   startTime?: string;
   endTime?: string | null;
-  quantidade?: number;
   status?: string;
   owner?: { fullName: string };
   responsible?: { fullName: string };
+  participants?: unknown[];
 }
 
 export function Turmas() {
@@ -84,7 +84,9 @@ export function Turmas() {
                 <div className="meta">
                   <span>{dayNames[dayOfWeek]} {startTime}{c.endTime ? `–${c.endTime}` : ""}</span>
                   <span>{owner?.fullName ?? ""}</span>
-                  {c.quantidade != null && <span>Qtd: {c.quantidade}</span>}
+                  {c.participants != null && (
+                    <span>Participantes: {c.participants.length}</span>
+                  )}
                 </div>
               </Link>
               <div className="card-actions">

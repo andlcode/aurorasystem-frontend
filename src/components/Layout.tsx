@@ -32,8 +32,7 @@ export function Layout() {
         <nav className="nav">
           {navLink("/turmas", "Turmas")}
           {navLink("/alunos", "Alunos")}
-          {(user?.role === "evangelizador" || user?.role === "super_admin") &&
-            navLink("/pessoas", "Pessoas")}
+          {user?.role === "super_admin" && navLink("/equipe", "Equipe")}
         </nav>
         <div className="header-actions">
           <span className="user-badge">{user?.fullName ?? user?.role}</span>

@@ -13,7 +13,10 @@ import { ChamadaTurma } from "./pages/ChamadaTurma";
 import { HistoricoTurma } from "./pages/HistoricoTurma";
 import { Alunos } from "./pages/Alunos";
 import { AlunosNovo } from "./pages/AlunosNovo";
-import { Pessoas } from "./pages/Pessoas";
+import { Equipe } from "./pages/Equipe";
+import { EquipeNovo } from "./pages/EquipeNovo";
+import { EquipeEditar } from "./pages/EquipeEditar";
+import { RequireSuperAdmin } from "./components/RequireSuperAdmin";
 import { SessionChamada } from "./pages/SessionChamada";
 
 function App() {
@@ -43,7 +46,30 @@ function App() {
             <Route path="sessions/:sessionId" element={<SessionChamada />} />
             <Route path="alunos" element={<Alunos />} />
             <Route path="alunos/novo" element={<AlunosNovo />} />
-            <Route path="pessoas" element={<Pessoas />} />
+            <Route
+              path="equipe"
+              element={
+                <RequireSuperAdmin>
+                  <Equipe />
+                </RequireSuperAdmin>
+              }
+            />
+            <Route
+              path="equipe/novo"
+              element={
+                <RequireSuperAdmin>
+                  <EquipeNovo />
+                </RequireSuperAdmin>
+              }
+            />
+            <Route
+              path="equipe/:id/editar"
+              element={
+                <RequireSuperAdmin>
+                  <EquipeEditar />
+                </RequireSuperAdmin>
+              }
+            />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>

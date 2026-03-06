@@ -9,6 +9,11 @@ interface Responsavel {
   role: string;
 }
 
+const ROLE_LABELS: Record<string, string> = {
+  evangelizador: "Evangelizador",
+  super_admin: "Super Admin",
+};
+
 const DAY_NAMES = [
   { value: 0, label: "Domingo" },
   { value: 1, label: "Segunda-feira" },
@@ -28,7 +33,6 @@ export function TurmaNova() {
   const [responsibleId, setResponsibleId] = useState("");
   const [dayOfWeek, setDayOfWeek] = useState(1);
   const [startTime, setStartTime] = useState("08:00");
-  const [quantidade, setQuantidade] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -44,12 +48,15 @@ export function TurmaNova() {
     return <Navigate to="/turmas" replace />;
   }
 
+  const responsiblesElegiveis = responsibles.filter((r) =>
+    ["evangelizador", "super_admin"].includes(r.role)
+  );
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
 
     const nameTrimmed = name.trim();
-    const qty = Number(quantidade);
 
     if (!nameTrimmed) {
       setError("Nome da turma é obrigatório.");
@@ -59,8 +66,9 @@ export function TurmaNova() {
       setError("Responsável é obrigatório.");
       return;
     }
-    if (quantidade.trim() === "" || isNaN(qty) || qty < 1) {
-      setError("Quantidade é obrigatória e deve ser maior que 0.");
+    const selected = responsibles.find((r) => r.id === responsibleId);
+    if (selected && !["evangelizador", "super_admin"].includes(selected.role)) {
+      setError("O responsável deve ser um evangelizador ou super_admin.");
       return;
     }
 
@@ -69,11 +77,9 @@ export function TurmaNova() {
     try {
       await api.post("/classes", {
         name: nameTrimmed,
-        ownerWorkerId: responsibleId,
-        dayOfWeek,
-        startTime,
-        endTime: null,
-        quantidade: qty,
+        responsibleUserId: responsibleId,
+        day: dayOfWeek,
+        time: startTime,
       });
 
       navigate("/turmas", { state: { successMessage: "Turma criada com sucesso" }, replace: true });
@@ -119,11 +125,11 @@ export function TurmaNova() {
             <option value="">
               {loadingResponsibles ? "Carregando..." : "Selecione o responsável"}
             </option>
-            {responsibles.map((r) => (
-              <option key={r.id} value={r.id}>
-                {r.fullName} ({r.role})
-              </option>
-            ))}
+            {responsiblesElegiveis.map((r) => (
+                <option key={r.id} value={r.id}>
+                  {r.fullName} — {ROLE_LABELS[r.role] ?? r.role}
+                </option>
+              ))}
           </select>
         </label>
 
@@ -152,18 +158,6 @@ export function TurmaNova() {
           />
         </label>
 
-        <label>
-          Quantidade *
-          <input
-            type="number"
-            min={1}
-            value={quantidade}
-            onChange={(e) => setQuantidade(e.target.value)}
-            placeholder="Ex: 20"
-            required
-          />
-        </label>
-
         {error && <p className="form-error">{error}</p>}
 
         <div className="form-actions">
@@ -173,7 +167,7 @@ export function TurmaNova() {
           <button
             type="submit"
             className="btn btn-primary"
-            disabled={loading || loadingResponsibles || responsibles.length === 0}
+            disabled={loading || loadingResponsibles || responsiblesElegiveis.length === 0}
           >
             {loading ? "Criando..." : "Criar turma"}
           </button>

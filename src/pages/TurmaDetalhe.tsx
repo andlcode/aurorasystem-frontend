@@ -7,12 +7,12 @@ import { getTodayBahia } from "../utils/dateUtils";
 interface ClassDetail {
   id: string;
   name: string;
-  description: string | null;
-  dayOfWeek: number;
-  startTime: string;
-  endTime: string | null;
-  status: string;
-  owner: { fullName: string };
+  day?: number;
+  dayOfWeek?: number;
+  time?: string;
+  startTime?: string;
+  responsible?: { fullName: string };
+  owner?: { fullName: string };
 }
 
 interface Member {
@@ -209,10 +209,9 @@ export function TurmaDetalhe() {
         </Link>
         <h1>{class_.name}</h1>
       </div>
-      {class_.description && <p className="muted">{class_.description}</p>}
       <div className="meta">
-        {dayNames[class_.dayOfWeek]} {class_.startTime}
-        {class_.endTime ? ` – ${class_.endTime}` : ""} • {class_.owner.fullName}
+        {dayNames[class_.dayOfWeek ?? class_.day ?? 0]} {class_.startTime ?? class_.time ?? ""} •{" "}
+        {(class_.owner ?? class_.responsible)?.fullName ?? ""}
       </div>
 
       <section className="section">
