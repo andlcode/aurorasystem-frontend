@@ -83,6 +83,9 @@ export function Login() {
           <Link to="/forgot-password" className="login-forgot">
             Esqueci minha senha
           </Link>
+          <Link to="/register" className="login-forgot" style={{ display: "block", marginTop: "0.5rem" }}>
+            Criar conta
+          </Link>
         </form>
       </div>
     </div>
