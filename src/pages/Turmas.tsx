@@ -6,13 +6,16 @@ import { useAuth } from "../context/AuthContext";
 interface Class {
   id: string;
   name: string;
-  description: string | null;
-  dayOfWeek: number;
-  startTime: string;
-  endTime: string | null;
+  description?: string | null;
+  day?: number;
+  dayOfWeek?: number;
+  time?: string;
+  startTime?: string;
+  endTime?: string | null;
   quantidade?: number;
-  status: string;
-  owner: { fullName: string };
+  status?: string;
+  owner?: { fullName: string };
+  responsible?: { fullName: string };
 }
 
 export function Turmas() {
@@ -69,21 +72,38 @@ export function Turmas() {
       )}
 
       <div className="card-grid">
-        {classes.map((c) => (
-          <Link
-            key={c.id}
-            to={`/turmas/${c.id}`}
-            className="card card-link"
-          >
-            <h3>{c.name}</h3>
-            {c.description && <p className="muted">{c.description}</p>}
-            <div className="meta">
-              <span>{dayNames[c.dayOfWeek]} {c.startTime}{c.endTime ? `–${c.endTime}` : ""}</span>
-              <span>{c.owner.fullName}</span>
-              {c.quantidade != null && <span>Qtd: {c.quantidade}</span>}
+        {classes.map((c) => {
+          const dayOfWeek = c.dayOfWeek ?? c.day ?? 0;
+          const startTime = c.startTime ?? c.time ?? "";
+          const owner = c.owner ?? c.responsible;
+          return (
+            <div key={c.id} className="card">
+              <Link to={`/turmas/${c.id}`} className="card-link-inner">
+                <h3>{c.name}</h3>
+                {c.description && <p className="muted">{c.description}</p>}
+                <div className="meta">
+                  <span>{dayNames[dayOfWeek]} {startTime}{c.endTime ? `–${c.endTime}` : ""}</span>
+                  <span>{owner?.fullName ?? ""}</span>
+                  {c.quantidade != null && <span>Qtd: {c.quantidade}</span>}
+                </div>
+              </Link>
+              <div className="card-actions">
+                <Link
+                  to={`/turmas/${c.id}/chamada`}
+                  className="btn btn-sm btn-primary"
+                >
+                  Fazer chamada
+                </Link>
+                <Link
+                  to={`/turmas/${c.id}/historico`}
+                  className="btn btn-sm btn-ghost"
+                >
+                  Ver histórico
+                </Link>
+              </div>
             </div>
-          </Link>
-        ))}
+          );
+        })}
       </div>
       {classes.length === 0 && (
         <p className="empty">Nenhuma turma encontrada.</p>

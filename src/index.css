@@ -547,6 +547,29 @@ h2 {
   flex-wrap: wrap;
 }
 
+.card-link-inner {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  margin-bottom: 1rem;
+}
+
+.card-link-inner:hover {
+  color: var(--color-primary);
+}
+
+.card-link-inner h3 {
+  margin: 0 0 0.5rem;
+}
+
+.card-actions {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  padding-top: 0.75rem;
+  border-top: 1px solid var(--color-border);
+}
+
 /* Session list */
 .session-list {
   display: flex;

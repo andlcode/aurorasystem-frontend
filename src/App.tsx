@@ -9,6 +9,8 @@ import { DashboardHome } from "./pages/DashboardHome";
 import { Turmas } from "./pages/Turmas";
 import { TurmaDetalhe } from "./pages/TurmaDetalhe";
 import { TurmaNova } from "./pages/TurmaNova";
+import { ChamadaTurma } from "./pages/ChamadaTurma";
+import { HistoricoTurma } from "./pages/HistoricoTurma";
 import { Alunos } from "./pages/Alunos";
 import { AlunosNovo } from "./pages/AlunosNovo";
 import { Pessoas } from "./pages/Pessoas";
@@ -35,6 +37,9 @@ function App() {
             <Route path="turmas" element={<Turmas />} />
             <Route path="turmas/nova" element={<TurmaNova />} />
             <Route path="turmas/:id" element={<TurmaDetalhe />} />
+            <Route path="turmas/:classId/chamada" element={<ChamadaTurma />} />
+            <Route path="turmas/:classId/chamada/:sessionId" element={<ChamadaTurma />} />
+            <Route path="turmas/:classId/historico" element={<HistoricoTurma />} />
             <Route path="sessions/:sessionId" element={<SessionChamada />} />
             <Route path="alunos" element={<Alunos />} />
             <Route path="alunos/novo" element={<AlunosNovo />} />
