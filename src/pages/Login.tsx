@@ -1,4 +1,4 @@
-import { useState } from "react";
+3import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 import type { User, UserRole } from "../types/auth";
@@ -6,7 +6,7 @@ import { USER_ROLES } from "../types/auth";
 import { api } from "../api/client";
 
 export function Login() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -21,26 +21,36 @@ export function Login() {
     e.preventDefault();
     setError(null);
     setLoading(true);
+
     try {
-      const res = await api.post<{ token: string; user: { personId: string; username: string; role: string; fullName: string } }>("/auth/login", {
-        username: username.trim(),
+      const res = await api.post<{
+        token: string;
+        user: { personId: string; username: string; role: string; fullName: string };
+      }>("/auth/login", {
+        email: email.trim(),
         password,
       });
+
       const data = res.data;
       const rawRole = data.user.role as string;
+
       if (!USER_ROLES.includes(rawRole as (typeof USER_ROLES)[number])) {
         throw new Error("Resposta inválida: role desconhecido");
       }
+
       const user: User = {
         personId: data.user.personId,
         username: data.user.username,
         fullName: data.user.fullName,
         role: rawRole as UserRole,
       };
+
       login(data.token, user);
       navigate(from, { replace: true });
     } catch (err: unknown) {
-      const msg = (err as { response?: { data?: { error?: string } } })?.response?.data?.error ?? "Erro ao entrar";
+      const msg =
+        (err as { response?: { data?: { error?: string } } })?.response?.data?.error ??
+        "Erro ao entrar";
       setError(msg);
     } finally {
       setLoading(false);
@@ -54,17 +64,18 @@ export function Login() {
         {message && <p className="login-success">{message}</p>}
         <form onSubmit={handleSubmit} className="login-form">
           <label>
-            Usuário
+            Email
             <input
-              type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="username"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="seuemail@exemplo.com"
               required
               autoFocus
-              autoComplete="username"
+              autoComplete="email"
             />
           </label>
+
           <label>
             Senha
             <input
@@ -76,13 +87,17 @@ export function Login() {
               autoComplete="current-password"
             />
           </label>
+
           {error && <p className="login-error">{error}</p>}
+
           <button type="submit" className="btn btn-primary" disabled={loading}>
             {loading ? "Entrando..." : "Entrar"}
           </button>
+
           <Link to="/forgot-password" className="login-forgot">
             Esqueci minha senha
           </Link>
+
           <Link to="/register" className="login-forgot" style={{ display: "block", marginTop: "0.5rem" }}>
             Criar conta
           </Link>
