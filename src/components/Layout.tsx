@@ -26,7 +26,7 @@ export function Layout() {
   return (
     <div className="layout">
       <header className="header">
-        <Link to="/" className="logo">
+        <Link to="/dashboard" className="logo">
           Cadastro
         </Link>
         <nav className="nav">

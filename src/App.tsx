@@ -29,7 +29,8 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<DashboardHome />} />
+            <Route index element={<Navigate to="/dashboard" replace />} />
+            <Route path="dashboard" element={<DashboardHome />} />
             <Route path="turmas" element={<Turmas />} />
             <Route path="turmas/:id" element={<TurmaDetalhe />} />
             <Route path="sessions/:sessionId" element={<SessionChamada />} />

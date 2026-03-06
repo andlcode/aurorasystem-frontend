@@ -6,7 +6,7 @@ import { USER_ROLES } from "../types/auth";
 import { api } from "../api/client";
 
 export function Login() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -14,7 +14,8 @@ export function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? "/";
+  const fromPath = (location.state as { from?: { pathname: string } })?.from?.pathname ?? "/dashboard";
+  const from = fromPath === "/" ? "/dashboard" : fromPath;
   const message = (location.state as { message?: string })?.message;
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,13 +28,17 @@ export function Login() {
         token: string;
         user: { personId: string; username: string; role: string; fullName: string };
       }>("/auth/login", {
-        email: email.trim(),
+        username: username.trim(),
         password,
       });
 
       const data = res.data;
-      const rawRole = data.user.role as string;
 
+      if (!res.data.token || !res.data.user) {
+        throw new Error("Resposta inválida: token ou usuário ausente");
+      }
+
+      const rawRole = data.user.role as string;
       if (!USER_ROLES.includes(rawRole as (typeof USER_ROLES)[number])) {
         throw new Error("Resposta inválida: role desconhecido");
       }
@@ -46,6 +51,10 @@ export function Login() {
       };
 
       login(data.token, user);
+
+      console.log("Login response:", data);
+      console.log("Token salvo:", localStorage.getItem("token"));
+
       navigate(from, { replace: true });
     } catch (err: unknown) {
       const msg =
@@ -64,15 +73,15 @@ export function Login() {
         {message && <p className="login-success">{message}</p>}
         <form onSubmit={handleSubmit} className="login-form">
           <label>
-            Email
+            Usuário
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              placeholder="seuemail@exemplo.com"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="username"
               required
               autoFocus
-              autoComplete="email"
+              autoComplete="username"
             />
           </label>
 
