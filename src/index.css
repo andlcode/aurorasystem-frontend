@@ -213,6 +213,23 @@ a:hover {
   margin: -0.5rem 0 1rem;
 }
 
+.alunos-list {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 0.75rem;
+}
+
+.alunos-list li {
+  padding: 0.25rem 0;
+  font-size: 0.875rem;
+}
+
+.empty-inline {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+  margin: 0 0 0.75rem;
+}
+
 .form-actions {
   display: flex;
   gap: 0.75rem;
@@ -431,6 +448,20 @@ h2 {
 }
 
 .modal input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.modal select {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  font-size: 0.9375rem;
+  font-family: inherit;
+  background: var(--color-surface);
+}
+
+.modal select:focus {
   outline: none;
   border-color: var(--color-primary);
 }

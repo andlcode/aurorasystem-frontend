@@ -32,7 +32,7 @@ export function Layout() {
         <nav className="nav">
           {navLink("/turmas", "Turmas")}
           {navLink("/alunos", "Alunos")}
-          {(user?.role === "admin" || user?.role === "super_admin") &&
+          {(user?.role === "evangelizador" || user?.role === "super_admin") &&
             navLink("/pessoas", "Pessoas")}
         </nav>
         <div className="header-actions">

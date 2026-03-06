@@ -1,7 +1,7 @@
 /**
  * Corresponde ao enum WorkerRole do backend.
  */
-export const USER_ROLES = ["super_admin", "admin", "worker"] as const;
+export const USER_ROLES = ["super_admin", "evangelizador", "worker"] as const;
 export type UserRole = (typeof USER_ROLES)[number];
 
 export type User = {
