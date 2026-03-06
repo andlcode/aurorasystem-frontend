@@ -6,6 +6,7 @@ import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { ForgotPassword } from "./pages/ForgotPassword";
 import { ResetPassword } from "./pages/ResetPassword";
+import { DashboardHome } from "./pages/DashboardHome";
 import { Turmas } from "./pages/Turmas";
 import { TurmaDetalhe } from "./pages/TurmaDetalhe";
 import { Pessoas } from "./pages/Pessoas";
@@ -28,7 +29,7 @@ function App() {
               </ProtectedRoute>
             }
           >
-            <Route index element={<Navigate to="/turmas" replace />} />
+            <Route index element={<DashboardHome />} />
             <Route path="turmas" element={<Turmas />} />
             <Route path="turmas/:id" element={<TurmaDetalhe />} />
             <Route path="sessions/:sessionId" element={<SessionChamada />} />

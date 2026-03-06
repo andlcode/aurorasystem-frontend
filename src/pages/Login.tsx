@@ -14,7 +14,7 @@ export function Login() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? "/turmas";
+  const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? "/";
   const message = (location.state as { message?: string })?.message;
 
   const handleSubmit = async (e: React.FormEvent) => {
