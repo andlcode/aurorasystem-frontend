@@ -25,7 +25,7 @@ api.interceptors.response.use(
     if (err.response?.status === 401) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      const publicPaths = ["/login", "/register", "/forgot-password", "/reset-password"];
+      const publicPaths = ["/login", "/forgot-password", "/reset-password"];
       if (!publicPaths.some((p) => window.location.pathname.startsWith(p))) {
         window.location.href = "/login?expired=1";
       }
