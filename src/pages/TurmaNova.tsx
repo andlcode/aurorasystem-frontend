@@ -38,7 +38,7 @@ export function TurmaNova() {
 
   useEffect(() => {
     api
-      .get<Responsavel[]>("/classes/responsibles")
+      .get<Responsavel[]>("/team/responsibles")
       .then((res) => setResponsibles(res.data))
       .catch(() => setResponsibles([]))
       .finally(() => setLoadingResponsibles(false));
