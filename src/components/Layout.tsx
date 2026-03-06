@@ -31,6 +31,7 @@ export function Layout() {
         </Link>
         <nav className="nav">
           {navLink("/turmas", "Turmas")}
+          {navLink("/alunos", "Alunos")}
           {(user?.role === "admin" || user?.role === "super_admin") &&
             navLink("/pessoas", "Pessoas")}
         </nav>

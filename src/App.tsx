@@ -8,6 +8,8 @@ import { ResetPassword } from "./pages/ResetPassword";
 import { DashboardHome } from "./pages/DashboardHome";
 import { Turmas } from "./pages/Turmas";
 import { TurmaDetalhe } from "./pages/TurmaDetalhe";
+import { Alunos } from "./pages/Alunos";
+import { AlunosNovo } from "./pages/AlunosNovo";
 import { Pessoas } from "./pages/Pessoas";
 import { SessionChamada } from "./pages/SessionChamada";
 
@@ -32,6 +34,8 @@ function App() {
             <Route path="turmas" element={<Turmas />} />
             <Route path="turmas/:id" element={<TurmaDetalhe />} />
             <Route path="sessions/:sessionId" element={<SessionChamada />} />
+            <Route path="alunos" element={<Alunos />} />
+            <Route path="alunos/novo" element={<AlunosNovo />} />
             <Route path="pessoas" element={<Pessoas />} />
           </Route>
           <Route path="*" element={<Navigate to="/" replace />} />

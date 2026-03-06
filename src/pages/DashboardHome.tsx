@@ -9,14 +9,14 @@ export function DashboardHome() {
         <button
           type="button"
           className="dashboard-home__btn btn btn-primary"
-          onClick={() => navigate("/pessoas")}
+          onClick={() => navigate("/alunos/novo")}
         >
           Adicionar aluno
         </button>
         <button
           type="button"
           className="dashboard-home__btn btn btn-primary"
-          onClick={() => navigate("/pessoas")}
+          onClick={() => navigate("/alunos")}
         >
           Listar alunos
         </button>
