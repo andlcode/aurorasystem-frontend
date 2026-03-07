@@ -42,17 +42,24 @@ export function Turmas() {
   }, [successMessage]);
 
   useEffect(() => {
+    const requestUrl = `${api.defaults.baseURL ?? ""}/classes`;
+    console.log("[Turmas] Chamando endpoint:", requestUrl);
+    setError(null);
+
     api
       .get<Class[]>("/classes")
       .then((res) => {
-        console.log("[Turmas] Resposta da API de turmas:", res.data);
+        console.log("[Turmas] Status HTTP:", res.status);
+        console.log("[Turmas] Body retornado:", res.data);
         setClasses(res.data);
       })
       .catch((err) => {
         console.error("[Turmas] Erro ao carregar turmas:", err);
+        console.log("[Turmas] Status HTTP de erro:", err.response?.status);
+        console.log("[Turmas] Body de erro:", err.response?.data);
         setError(
           err.response?.data?.error ??
-            "Não foi possível carregar as turmas agora. Tente novamente em instantes."
+            "Erro ao carregar turmas."
         );
       })
       .finally(() => setLoading(false));
@@ -117,7 +124,7 @@ export function Turmas() {
         })}
       </div>
       {classes.length === 0 && (
-        <p className="empty">Nenhuma turma encontrada.</p>
+        <p className="empty">Nenhuma turma cadastrada ainda.</p>
       )}
     </div>
   );
