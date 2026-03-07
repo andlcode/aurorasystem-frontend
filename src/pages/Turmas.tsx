@@ -44,15 +44,24 @@ export function Turmas() {
   useEffect(() => {
     api
       .get<Class[]>("/classes")
-      .then((res) => setClasses(res.data))
-      .catch((err) => setError(err.response?.data?.error ?? err.message))
+      .then((res) => {
+        console.log("[Turmas] Resposta da API de turmas:", res.data);
+        setClasses(res.data);
+      })
+      .catch((err) => {
+        console.error("[Turmas] Erro ao carregar turmas:", err);
+        setError(
+          err.response?.data?.error ??
+            "Não foi possível carregar as turmas agora. Tente novamente em instantes."
+        );
+      })
       .finally(() => setLoading(false));
   }, []);
 
   const dayNames = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
 
   if (loading) return <div className="loading">Carregando turmas...</div>;
-  if (error) return <div className="error">Erro: {error}</div>;
+  if (error) return <div className="error">{error}</div>;
 
   return (
     <div className="page">

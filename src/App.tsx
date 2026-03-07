@@ -18,6 +18,7 @@ import { EquipeNovo } from "./pages/EquipeNovo";
 import { EquipeEditar } from "./pages/EquipeEditar";
 import { RequireSuperAdmin } from "./components/RequireSuperAdmin";
 import { SessionChamada } from "./pages/SessionChamada";
+import { Estatisticas } from "./pages/Estatisticas";
 
 function App() {
   return (
@@ -37,6 +38,7 @@ function App() {
           >
             <Route index element={<Navigate to="/dashboard" replace />} />
             <Route path="dashboard" element={<DashboardHome />} />
+            <Route path="estatisticas" element={<Estatisticas />} />
             <Route path="turmas" element={<Turmas />} />
             <Route path="turmas/nova" element={<TurmaNova />} />
             <Route path="turmas/:id" element={<TurmaDetalhe />} />

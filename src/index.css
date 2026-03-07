@@ -318,6 +318,204 @@ a:hover {
   font-size: 11px;
 }
 
+.statistics-page {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.statistics-page__header {
+  align-items: flex-start;
+}
+
+.statistics-page__subtitle {
+  max-width: 760px;
+}
+
+.statistics-filters {
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+}
+
+.statistics-filters__header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.statistics-filters__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.statistics-filters__field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.statistics-filters__field span {
+  color: var(--color-text-muted);
+}
+
+.statistics-filters__field input,
+.statistics-filters__field select {
+  padding: 0.65rem 0.85rem;
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+  background: var(--color-surface);
+  font: inherit;
+}
+
+.statistics-filters__field input:focus,
+.statistics-filters__field select:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px rgba(15, 118, 110, 0.12);
+}
+
+.statistics-grid {
+  display: grid;
+  gap: 1rem;
+}
+
+.statistics-grid--charts {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+}
+
+.statistics-grid--details {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.statistics-panel {
+  border-radius: 16px;
+  box-shadow: var(--shadow-md);
+}
+
+.statistics-panel--wide {
+  grid-column: span 5;
+}
+
+.statistics-panel--full {
+  grid-column: 1 / -1;
+}
+
+.statistics-grid--charts .statistics-panel:last-child {
+  grid-column: span 2;
+}
+
+.statistics-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.statistics-list__row {
+  display: grid;
+  grid-template-columns: 120px 1fr 70px;
+  align-items: center;
+  gap: 0.9rem;
+}
+
+.statistics-list__meta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15rem;
+}
+
+.statistics-list__meta span {
+  color: var(--color-text-muted);
+  font-size: 0.8125rem;
+}
+
+.statistics-list__bar {
+  height: 10px;
+  border-radius: 999px;
+  background: #e9f4f3;
+  overflow: hidden;
+}
+
+.statistics-list__bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, var(--color-primary), var(--color-accent));
+}
+
+.statistics-list__value {
+  text-align: right;
+  font-size: 0.875rem;
+}
+
+.donut-chart {
+  display: grid;
+  grid-template-columns: minmax(180px, 240px) 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+
+.donut-chart__visual {
+  position: relative;
+  width: 100%;
+  max-width: 220px;
+  margin: 0 auto;
+}
+
+.donut-chart__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.donut-chart__center {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.donut-chart__center strong {
+  font-size: 1.65rem;
+}
+
+.donut-chart__center span {
+  color: var(--color-text-muted);
+  font-size: 0.875rem;
+}
+
+.donut-chart__legend {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.donut-chart__legend-item {
+  display: grid;
+  grid-template-columns: 12px 1fr auto;
+  gap: 0.75rem;
+  align-items: center;
+}
+
+.donut-chart__legend-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 999px;
+}
+
+.donut-chart__legend-label {
+  color: var(--color-text);
+}
+
+.donut-chart__legend-value {
+  color: var(--color-text-muted);
+}
+
 /* Page */
 .page {
   animation: fadeIn 0.2s ease;
@@ -977,6 +1175,20 @@ h2 {
   .dashboard-grid {
     grid-template-columns: 1fr;
   }
+
+  .statistics-grid--charts,
+  .statistics-grid--details {
+    grid-template-columns: 1fr;
+  }
+
+  .statistics-panel--wide,
+  .statistics-grid--charts .statistics-panel:last-child {
+    grid-column: auto;
+  }
+
+  .statistics-filters__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 @media (max-width: 720px) {
@@ -1004,5 +1216,25 @@ h2 {
 
   .summary-card__value {
     font-size: 1.75rem;
+  }
+
+  .statistics-filters__header {
+    flex-direction: column;
+  }
+
+  .statistics-filters__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .statistics-list__row {
+    grid-template-columns: 1fr;
+  }
+
+  .statistics-list__value {
+    text-align: left;
+  }
+
+  .donut-chart {
+    grid-template-columns: 1fr;
   }
 }

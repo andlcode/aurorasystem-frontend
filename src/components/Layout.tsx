@@ -30,6 +30,7 @@ export function Layout() {
           Cadastro
         </Link>
         <nav className="nav">
+          {navLink("/estatisticas", "Estatísticas")}
           {navLink("/turmas", "Turmas")}
           {navLink("/alunos", "Alunos")}
           {user?.role === "super_admin" && navLink("/equipe", "Equipe")}

@@ -5,7 +5,9 @@ import { useAuth } from "../context/AuthContext";
 
 interface Responsavel {
   id: string;
+  name?: string;
   fullName: string;
+  email?: string | null;
   role: string;
 }
 
@@ -38,9 +40,15 @@ export function TurmaNova() {
 
   useEffect(() => {
     api
-      .get<Responsavel[]>("/team/responsibles")
-      .then((res) => setResponsibles(res.data))
-      .catch(() => setResponsibles([]))
+      .get<Responsavel[]>("/classes/responsibles")
+      .then((res) => {
+        console.log("[TurmaNova] Responsáveis carregados:", res.data);
+        setResponsibles(res.data);
+      })
+      .catch((err) => {
+        console.error("[TurmaNova] Erro ao carregar responsáveis:", err);
+        setResponsibles([]);
+      })
       .finally(() => setLoadingResponsibles(false));
   }, []);
 
@@ -75,15 +83,20 @@ export function TurmaNova() {
     setLoading(true);
 
     try {
-      await api.post("/classes", {
+      const payload = {
         name: nameTrimmed,
         responsibleUserId: responsibleId,
         day: dayOfWeek,
         time: startTime,
-      });
+      };
+
+      console.log("[TurmaNova] Payload enviado para criar turma:", payload);
+
+      await api.post("/classes", payload);
 
       navigate("/turmas", { state: { successMessage: "Turma criada com sucesso" }, replace: true });
     } catch (err: unknown) {
+      console.error("[TurmaNova] Erro ao criar turma:", err);
       const res = err as { response?: { data?: { error?: string } } };
       const msg = res.response?.data?.error ?? "Erro ao criar turma. Tente novamente.";
       setError(msg);
@@ -123,15 +136,23 @@ export function TurmaNova() {
             disabled={loadingResponsibles}
           >
             <option value="">
-              {loadingResponsibles ? "Carregando..." : "Selecione o responsável"}
+              {loadingResponsibles
+                ? "Carregando responsáveis..."
+                : responsiblesElegiveis.length === 0
+                  ? "Nenhum responsável disponível"
+                  : "Selecione o responsável"}
             </option>
             {responsiblesElegiveis.map((r) => (
                 <option key={r.id} value={r.id}>
-                  {r.fullName} — {ROLE_LABELS[r.role] ?? r.role}
+                  {(r.name ?? r.fullName)} - {ROLE_LABELS[r.role] ?? r.role}
                 </option>
               ))}
           </select>
         </label>
+
+        {!loadingResponsibles && responsiblesElegiveis.length === 0 && (
+          <p className="empty-inline">Nenhum responsável disponível.</p>
+        )}
 
         <label>
           Dia *

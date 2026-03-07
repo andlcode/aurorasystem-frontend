@@ -13,6 +13,7 @@ interface AuthContextValue {
   login: (token: string, user: User) => void;
   logout: () => void;
   isAuthenticated: boolean;
+  isReady: boolean;
 }
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -21,21 +22,36 @@ const STORAGE_KEYS = { token: "token", user: "user" } as const;
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
+  const [isReady, setIsReady] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem(STORAGE_KEYS.token);
     const stored = localStorage.getItem(STORAGE_KEYS.user);
-    if (token && stored) {
+
+    if (!token) {
+      localStorage.removeItem(STORAGE_KEYS.user);
+      setIsReady(true);
+      return;
+    }
+
+    if (stored) {
       try {
         const parsed = JSON.parse(stored) as User;
-        if (parsed.personId && parsed.role) {
+        if (parsed.personId && parsed.role && parsed.username && parsed.fullName) {
           setUser(parsed);
+        } else {
+          localStorage.removeItem(STORAGE_KEYS.token);
+          localStorage.removeItem(STORAGE_KEYS.user);
         }
       } catch {
         localStorage.removeItem(STORAGE_KEYS.token);
         localStorage.removeItem(STORAGE_KEYS.user);
       }
+    } else {
+      localStorage.removeItem(STORAGE_KEYS.token);
     }
+
+    setIsReady(true);
   }, []);
 
   const login = useCallback((token: string, userData: User) => {
@@ -56,7 +72,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         login,
         logout,
-        isAuthenticated: !!user,
+        isAuthenticated: !!localStorage.getItem(STORAGE_KEYS.token),
+        isReady,
       }}
     >
       {children}

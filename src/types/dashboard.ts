@@ -3,6 +3,10 @@ export interface DashboardTotals {
   activeParticipants: number;
   sessionsThisMonth: number;
   averageAttendance: number;
+  totalStudents: number;
+  totalTeamMembers: number;
+  attendanceRate: number;
+  totalAttendanceRecords: number;
 }
 
 export interface AttendanceByClassItem {
@@ -35,10 +39,61 @@ export interface RecentSessionItem {
   absentCount: number;
 }
 
+export interface AttendanceByDayItem {
+  day: number;
+  label: string;
+  averageAttendance: number;
+  totalRecords: number;
+}
+
+export interface StatusDistributionItem {
+  status: "present" | "absent" | "justified";
+  label: string;
+  count: number;
+  percentage: number;
+}
+
+export interface MostActiveClassItem {
+  classId: string;
+  className: string;
+  sessionCount: number;
+  totalAttendanceRecords: number;
+  attendanceRate: number;
+}
+
+export interface NewStudentItem {
+  participantId: string;
+  participantName: string;
+  email: string | null;
+  classId: string;
+  className: string;
+  joinedAt: string;
+}
+
+export interface StatisticsClassOption {
+  id: string;
+  name: string;
+}
+
+export interface StatisticsFiltersState {
+  from: string | null;
+  to: string | null;
+  classId: string | null;
+  status: "all" | "present" | "absent" | "justified";
+}
+
 export interface DashboardResponse {
   totals: DashboardTotals;
   attendanceByClass: AttendanceByClassItem[];
   attendanceByMonth: AttendanceByMonthItem[];
+  attendanceByDay: AttendanceByDayItem[];
+  statusDistribution: StatusDistributionItem[];
   topAbsences: TopAbsenceItem[];
+  mostActiveClasses: MostActiveClassItem[];
+  newStudentsRecently: NewStudentItem[];
   recentSessions: RecentSessionItem[];
+  filters: {
+    availableClasses: StatisticsClassOption[];
+    selected: StatisticsFiltersState;
+  };
 }
