@@ -5,16 +5,10 @@ import { useAuth } from "../context/AuthContext";
 
 interface Responsavel {
   id: string;
-  name?: string;
-  fullName: string;
+  name: string;
   email?: string | null;
-  role: string;
+  role: "evangelizador" | "super_admin" | "moderador" | null;
 }
-
-const ROLE_LABELS: Record<string, string> = {
-  evangelizador: "Evangelizador",
-  super_admin: "Super Admin",
-};
 
 const DAY_NAMES = [
   { value: 0, label: "Domingo" },
@@ -40,7 +34,7 @@ export function TurmaNova() {
 
   useEffect(() => {
     api
-      .get<Responsavel[]>("/classes/responsibles")
+      .get<Responsavel[]>("/people/responsaveis")
       .then((res) => {
         console.log("[TurmaNova] Responsáveis carregados:", res.data);
         setResponsibles(res.data);
@@ -55,10 +49,6 @@ export function TurmaNova() {
   if (user?.role !== "super_admin") {
     return <Navigate to="/turmas" replace />;
   }
-
-  const responsiblesElegiveis = responsibles.filter((r) =>
-    ["evangelizador", "super_admin"].includes(r.role)
-  );
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -75,8 +65,8 @@ export function TurmaNova() {
       return;
     }
     const selected = responsibles.find((r) => r.id === responsibleId);
-    if (selected && !["evangelizador", "super_admin"].includes(selected.role)) {
-      setError("O responsável deve ser um evangelizador ou super_admin.");
+    if (selected && !["evangelizador", "super_admin", "moderador"].includes(selected.role ?? "")) {
+      setError("O responsável deve ser um evangelizador, super_admin ou moderador.");
       return;
     }
 
@@ -138,19 +128,19 @@ export function TurmaNova() {
             <option value="">
               {loadingResponsibles
                 ? "Carregando responsáveis..."
-                : responsiblesElegiveis.length === 0
+                : responsibles.length === 0
                   ? "Nenhum responsável disponível"
                   : "Selecione o responsável"}
             </option>
-            {responsiblesElegiveis.map((r) => (
+            {responsibles.map((r) => (
                 <option key={r.id} value={r.id}>
-                  {(r.name ?? r.fullName)} - {ROLE_LABELS[r.role] ?? r.role}
+                  {r.name}
                 </option>
               ))}
           </select>
         </label>
 
-        {!loadingResponsibles && responsiblesElegiveis.length === 0 && (
+        {!loadingResponsibles && responsibles.length === 0 && (
           <p className="empty-inline">Nenhum responsável disponível.</p>
         )}
 
@@ -188,7 +178,7 @@ export function TurmaNova() {
           <button
             type="submit"
             className="btn btn-primary"
-            disabled={loading || loadingResponsibles || responsiblesElegiveis.length === 0}
+            disabled={loading || loadingResponsibles || responsibles.length === 0}
           >
             {loading ? "Criando..." : "Criar turma"}
           </button>
