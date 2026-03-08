@@ -15,6 +15,7 @@ interface StudentClass {
 interface Person {
   id: string;
   fullName: string;
+  name?: string; // API também retorna name (Participant)
   email: string | null;
   phone: string | null;
   type: string;
@@ -199,7 +200,7 @@ export function Alunos() {
     setDeleteError(null);
 
     try {
-      const response = await api.patch<Person>(`/people/${pendingDelete.id}/status`, {
+      const response = await api.patch<Person>(`/participants/${pendingDelete.id}/status`, {
         status: "inactive",
       });
       updateAlunoInList(response.data);
@@ -426,7 +427,7 @@ export function Alunos() {
           <article key={a.id} className="student-quick-card">
             <div className="student-quick-card__top">
               <div className="student-quick-card__identity">
-                <h2 className="student-quick-card__name">{a.fullName ?? a.name}</h2>
+                <h2 className="student-quick-card__name">{a.fullName ?? a.name ?? ""}</h2>
                 {renderStatusIndicator(a)}
               </div>
             </div>

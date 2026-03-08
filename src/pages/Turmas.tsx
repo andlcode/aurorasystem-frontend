@@ -15,8 +15,8 @@ interface Class {
   startTime?: string;
   endTime?: string | null;
   status?: string;
-  owner?: { fullName: string };
-  responsible?: { fullName: string };
+  owner?: { name?: string; fullName?: string };
+  responsible?: { name?: string; fullName?: string };
   responsibleUserId?: string;
   participants?: unknown[];
 }
@@ -187,7 +187,7 @@ export function Turmas() {
                 {c.description && <p className="muted">{c.description}</p>}
                 <div className="meta">
                   <span>{dayNames[dayOfWeek]} {startTime}{c.endTime ? `–${c.endTime}` : ""}</span>
-                  <span>{(owner ?? responsible)?.name ?? ""}</span>
+                  <span>{owner?.name ?? owner?.fullName ?? ""}</span>
                   {c.participants != null && (
                     <span>Participantes: {c.participants.length}</span>
                   )}

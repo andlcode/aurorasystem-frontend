@@ -5,11 +5,11 @@ import { WORKER_ROLE_LABELS } from "../types/auth";
 
 interface TeamMember {
   id: string;
-  fullName: string;
+  name: string; // API retorna User com name
   email: string | null;
   status: string;
+  role: string;
   createdAt: string;
-  worker?: { role: string; function: string };
 }
 
 export function Equipe() {
@@ -108,7 +108,7 @@ export function Equipe() {
                 <td>{m.email ?? "—"}</td>
                 <td>
                   <span className="badge">
-                    {m.worker ? WORKER_ROLE_LABELS[m.worker.role as keyof typeof WORKER_ROLE_LABELS] ?? m.worker.role : "—"}
+                    {WORKER_ROLE_LABELS[m.role as keyof typeof WORKER_ROLE_LABELS] ?? m.role ?? "—"}
                   </span>
                 </td>
                 <td>

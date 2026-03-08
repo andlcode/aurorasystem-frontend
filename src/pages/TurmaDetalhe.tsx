@@ -17,7 +17,8 @@ interface ClassDetail {
 
 interface Member {
   id: string;
-  fullName: string;
+  fullName?: string;
+  name?: string; // API retorna name (Participant) ou fullName (session)
   email: string | null;
   phone: string | null;
 }

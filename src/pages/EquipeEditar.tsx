@@ -35,8 +35,7 @@ export function EquipeEditar() {
           name: res.data.name,
           email: res.data.email ?? "",
           status: res.data.status as "active" | "inactive",
-          function: res.data.worker?.function ?? "",
-          role: (res.data.worker?.role ?? "EVANGELIZADOR") as UserRole,
+          role: (res.data.role ?? "EVANGELIZADOR") as UserRole,
         });
       })
       .catch((err) => setError(err.response?.data?.error ?? err.message))
