@@ -18,8 +18,9 @@ export function Login() {
   const from = fromPath === "/" ? "/dashboard" : fromPath;
   const message = (location.state as { message?: string })?.message;
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    e.stopPropagation();
     setError(null);
     setLoading(true);
 
@@ -72,9 +73,11 @@ export function Login() {
         <h1>Entrar</h1>
         {message && <p className="login-success">{message}</p>}
         <form onSubmit={handleSubmit} className="login-form">
-          <label>
+          <label htmlFor="username">
             Usuário
             <input
+              id="username"
+              name="username"
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
@@ -85,9 +88,11 @@ export function Login() {
             />
           </label>
 
-          <label>
+          <label htmlFor="password">
             Senha
             <input
+              id="password"
+              name="password"
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
