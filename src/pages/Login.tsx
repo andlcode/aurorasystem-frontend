@@ -26,7 +26,7 @@ export function Login() {
     try {
       const res = await api.post<{
         token: string;
-        user: { personId: string; username: string; role: string; fullName: string };
+        user: { userId: string; username: string; role: string; name: string };
       }>("/auth/login", {
         username: username.trim(),
         password,
@@ -44,9 +44,9 @@ export function Login() {
       }
 
       const user: User = {
-        personId: data.user.personId,
+        userId: data.user.userId,
         username: data.user.username,
-        fullName: data.user.fullName,
+        name: data.user.name,
         role: rawRole as UserRole,
       };
 

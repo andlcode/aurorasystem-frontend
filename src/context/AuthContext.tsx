@@ -37,7 +37,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (stored) {
       try {
         const parsed = JSON.parse(stored) as User;
-        if (parsed.personId && parsed.role && parsed.username && parsed.fullName) {
+        if (parsed.userId && parsed.role && parsed.username && parsed.name) {
           setUser(parsed);
         } else {
           localStorage.removeItem(STORAGE_KEYS.token);

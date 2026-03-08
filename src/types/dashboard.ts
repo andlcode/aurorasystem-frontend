@@ -30,6 +30,23 @@ export interface TopAbsenceItem {
   lastPresence: string | null;
 }
 
+export interface AttendanceByParticipantItem {
+  participantId: string;
+  participantName: string;
+  className: string | null;
+  attendanceRate: number;
+  presentCount: number;
+  totalAttendanceRecords: number;
+}
+
+export interface ConsecutiveAbsenceItem {
+  participantId: string;
+  participantName: string;
+  className: string | null;
+  consecutiveAbsences: number;
+  lastSessionDate: string | null;
+}
+
 export interface RecentSessionItem {
   sessionId: string;
   classId: string;
@@ -86,6 +103,8 @@ export interface DashboardResponse {
   totals: DashboardTotals;
   attendanceByClass: AttendanceByClassItem[];
   attendanceByMonth: AttendanceByMonthItem[];
+  attendanceByParticipant: AttendanceByParticipantItem[];
+  consecutiveAbsences: ConsecutiveAbsenceItem[];
   attendanceByDay: AttendanceByDayItem[];
   statusDistribution: StatusDistributionItem[];
   topAbsences: TopAbsenceItem[];

@@ -14,11 +14,11 @@ export function StatisticsFilters({
   onReset,
 }: StatisticsFiltersProps) {
   return (
-    <section className="card statistics-filters">
+    <section className="card statistics-filters statistics-filters--compact">
       <div className="statistics-filters__header">
         <div>
           <h2>Filtros</h2>
-          <p className="muted">Refine o período, a turma e o status para explorar os indicadores.</p>
+          <p className="muted">Período, turma e status.</p>
         </div>
         <button type="button" className="btn btn-ghost" onClick={onReset}>
           Limpar filtros

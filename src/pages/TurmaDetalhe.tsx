@@ -11,8 +11,8 @@ interface ClassDetail {
   dayOfWeek?: number;
   time?: string;
   startTime?: string;
-  responsible?: { fullName: string };
-  owner?: { fullName: string };
+  responsible?: { name: string };
+  owner?: { name: string };
 }
 
 interface Member {
@@ -94,7 +94,7 @@ export function TurmaDetalhe() {
       setVincularError(null);
       setParticipanteSelecionado("");
       api
-        .get<Member[]>("/people?type=participant")
+        .get<Member[]>("/participants?status=active")
         .then((res) => setParticipantesDisponiveis(res.data))
         .catch(() => setParticipantesDisponiveis([]));
     }
@@ -198,7 +198,7 @@ export function TurmaDetalhe() {
   );
 
   const filteredMembers = members.filter((m) =>
-    m.fullName.toLowerCase().includes(search.toLowerCase())
+    (m.fullName ?? m.name ?? "").toLowerCase().includes(search.toLowerCase())
   );
 
   return (
@@ -211,7 +211,7 @@ export function TurmaDetalhe() {
       </div>
       <div className="meta">
         {dayNames[class_.dayOfWeek ?? class_.day ?? 0]} {class_.startTime ?? class_.time ?? ""} •{" "}
-        {(class_.owner ?? class_.responsible)?.fullName ?? ""}
+        {(class_.owner ?? class_.responsible)?.name ?? ""}
       </div>
 
       <section className="section">
@@ -219,13 +219,13 @@ export function TurmaDetalhe() {
         {participants.length > 0 ? (
           <ul className="alunos-list">
             {participants.map((p) => (
-              <li key={p.id}>{p.fullName}</li>
+              <li key={p.id}>{p.fullName ?? p.name ?? ""}</li>
             ))}
           </ul>
         ) : (
           <p className="empty-inline">Nenhum participante vinculado a esta turma.</p>
         )}
-        {user?.role === "super_admin" && (
+        {(user?.role === "SUPER_ADMIN" || user?.role === "COORDENADOR") && (
           <button
             type="button"
             className="btn btn-sm btn-primary"
@@ -290,7 +290,7 @@ export function TurmaDetalhe() {
                 const status = att?.status ?? null;
                 return (
                   <div key={m.id} className="participant-row">
-                    <span className="participant-name">{m.fullName}</span>
+                    <span className="participant-name">{m.fullName ?? m.name ?? ""}</span>
                     <div className="attendance-buttons">
                       <button
                         type="button"
@@ -309,7 +309,7 @@ export function TurmaDetalhe() {
                       <button
                         type="button"
                         className={`btn btn-sm ${status === "justified" ? "btn-justified" : "btn-ghost"}`}
-                        onClick={() => handleJustifiedClick(m.id, m.fullName)}
+                        onClick={() => handleJustifiedClick(m.id, m.fullName ?? m.name ?? "")}
                       >
                         Justificada
                       </button>
@@ -344,7 +344,7 @@ export function TurmaDetalhe() {
                   .filter((p) => !participants.some((m) => m.id === p.id))
                   .map((p) => (
                     <option key={p.id} value={p.id}>
-                      {p.fullName}
+                      {p.fullName ?? p.name ?? ""}
                     </option>
                   ))}
               </select>

@@ -19,6 +19,7 @@ import { EquipeEditar } from "./pages/EquipeEditar";
 import { RequireSuperAdmin } from "./components/RequireSuperAdmin";
 import { SessionChamada } from "./pages/SessionChamada";
 import { Estatisticas } from "./pages/Estatisticas";
+import { ChamadaRapida } from "./pages/ChamadaRapida";
 
 function App() {
   return (
@@ -42,6 +43,7 @@ function App() {
             <Route path="turmas" element={<Turmas />} />
             <Route path="turmas/nova" element={<TurmaNova />} />
             <Route path="turmas/:id" element={<TurmaDetalhe />} />
+            <Route path="turmas/:classId/chamada-rapida" element={<ChamadaRapida />} />
             <Route path="turmas/:classId/chamada" element={<ChamadaTurma />} />
             <Route path="turmas/:classId/chamada/:sessionId" element={<ChamadaTurma />} />
             <Route path="turmas/:classId/historico" element={<HistoricoTurma />} />

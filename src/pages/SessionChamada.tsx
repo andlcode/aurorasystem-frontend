@@ -7,7 +7,7 @@ interface AttendanceItem {
   participantId: string;
   status: string;
   justificationReason: string | null;
-  participant: { id: string; fullName: string };
+  participant: { id: string; fullName?: string; name?: string };
 }
 
 interface AttendanceResponse {
@@ -61,7 +61,7 @@ export function SessionChamada() {
           <tbody>
             {data.items.map((a) => (
               <tr key={a.id}>
-                <td>{a.participant.fullName}</td>
+                <td>{a.participant.fullName ?? a.participant.name ?? ""}</td>
                 <td><span className={`badge ${a.status}`}>{a.status}</span></td>
                 <td>{a.justificationReason ?? "—"}</td>
               </tr>

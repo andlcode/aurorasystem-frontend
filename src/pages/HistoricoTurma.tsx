@@ -7,7 +7,7 @@ interface ClassInfo {
   name: string;
   day?: number;
   time?: string;
-  responsible?: { fullName: string };
+  responsible?: { name: string };
 }
 
 interface SessionItem {
@@ -95,7 +95,7 @@ export function HistoricoTurma() {
           </span>
         )}
         {classInfo.responsible && (
-          <span>{classInfo.responsible.fullName}</span>
+          <span>{classInfo.responsible?.name ?? ""}</span>
         )}
       </div>
 

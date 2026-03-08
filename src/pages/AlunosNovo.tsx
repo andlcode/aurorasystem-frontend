@@ -1,9 +1,11 @@
 import { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { api } from "../api/client";
+import { useAuth } from "../context/AuthContext";
 
 export function AlunosNovo() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [fullName, setFullName] = useState("");
   const [birthDate, setBirthDate] = useState("");
   const [phone, setPhone] = useState("");
@@ -11,14 +13,18 @@ export function AlunosNovo() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  if (user?.role !== "SUPER_ADMIN" && user?.role !== "COORDENADOR") {
+    return <Navigate to="/dashboard" replace />;
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
     setLoading(true);
 
     try {
-      await api.post("/people", {
-        fullName: fullName.trim(),
+      await api.post("/participants", {
+        name: fullName.trim(),
         birthDate: birthDate || null,
         phone: phone.trim() || null,
         email: email.trim() || null,

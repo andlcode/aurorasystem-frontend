@@ -9,7 +9,7 @@ interface ClassOption {
 
 interface StudentClassModalProps {
   studentName: string;
-  classes: Array<{ id: string; name: string }>;
+  classes: Array<{ id: string; name: string; day?: number; time?: string }>;
   classOptions: ClassOption[];
   loadingClasses: boolean;
   saving: boolean;
@@ -36,9 +36,20 @@ export function StudentClassModal({
     setClassId("");
   }, [studentName]);
 
+  const selectedClass = classOptions.find((option) => option.id === classId);
+  const hasScheduleConflict =
+    selectedClass != null &&
+    classes.some(
+      (item) =>
+        item.day != null &&
+        item.time != null &&
+        item.day === selectedClass.day &&
+        item.time === selectedClass.time
+    );
+
   const handleSubmit = (event: React.FormEvent) => {
     event.preventDefault();
-    if (!classId) {
+    if (!classId || hasScheduleConflict) {
       return;
     }
     onSubmit(classId);
@@ -46,10 +57,10 @@ export function StudentClassModal({
 
   return (
     <div className="modal-overlay" role="presentation">
-      <form className="modal" onSubmit={handleSubmit}>
+      <form className="modal student-class-sheet" onSubmit={handleSubmit}>
         <h3>Vincular à turma</h3>
         <p className="muted">
-          Selecione uma turma para vincular <strong>{studentName}</strong>.
+          Escolha rapidamente uma turma para <strong>{studentName}</strong>.
         </p>
 
         <div className="student-current-classes">
@@ -92,6 +103,9 @@ export function StudentClassModal({
           </select>
         </label>
 
+        {hasScheduleConflict && (
+          <p className="form-error">Este participante já está em uma turma no mesmo dia e horário.</p>
+        )}
         {error && <p className="form-error">{error}</p>}
         {!loadingClasses && classOptions.length === 0 && (
           <p className="empty-inline">Nenhuma turma cadastrada no momento.</p>
@@ -104,7 +118,7 @@ export function StudentClassModal({
           <button
             type="submit"
             className="btn btn-primary"
-            disabled={saving || loadingClasses || !classId}
+            disabled={saving || loadingClasses || !classId || hasScheduleConflict}
           >
             {saving ? "Vinculando..." : "Vincular"}
           </button>

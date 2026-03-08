@@ -4,7 +4,7 @@ import { useAuth } from "../context/AuthContext";
 export function RequireSuperAdmin({ children }: { children: React.ReactNode }) {
   const { user } = useAuth();
 
-  if (user?.role !== "super_admin") {
+  if (user?.role !== "SUPER_ADMIN") {
     return <Navigate to="/dashboard" replace />;
   }
 

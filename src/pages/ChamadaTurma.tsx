@@ -17,7 +17,7 @@ interface ClassInfo {
   name: string;
   day?: number;
   time?: string;
-  responsible?: { fullName: string };
+  responsible?: { name: string };
 }
 
 interface SessionData {
@@ -30,7 +30,7 @@ interface SessionData {
     participantId: string;
     status: "present" | "absent" | "justified";
     justificationReason?: string | null;
-    participant: { id: string; fullName: string };
+    participant: { id: string; fullName?: string; name?: string };
   }>;
   present: number;
   absent: number;
@@ -49,6 +49,8 @@ export function ChamadaTurma() {
   const { classId, sessionId } = useParams<{ classId: string; sessionId?: string }>();
   const [classInfo, setClassInfo] = useState<ClassInfo | null>(null);
   const [session, setSession] = useState<SessionData | null>(null);
+  const [linkedParticipants, setLinkedParticipants] = useState<Member[]>([]);
+  const [loadingParticipants, setLoadingParticipants] = useState(false);
   const [selectedDate, setSelectedDate] = useState(() => getTodayBahia());
   const [statusMap, setStatusMap] = useState<Record<string, StatusKey>>({});
   const [notesMap, setNotesMap] = useState<Record<string, string>>({});
@@ -70,6 +72,28 @@ export function ChamadaTurma() {
     return res.data.find((c) => c.id === classId) ?? null;
   }, [classId]);
 
+  const loadLinkedParticipants = useCallback(async () => {
+    if (!classId) return;
+
+    setLoadingParticipants(true);
+
+    try {
+      console.log("[ChamadaTurma] selected class id:", classId);
+      const res = await api.get<Member[]>(`/classes/${classId}/participants`);
+      console.log("[ChamadaTurma] attendance participants endpoint response:", {
+        classId,
+        total: res.data.length,
+        participants: res.data,
+      });
+      setLinkedParticipants(res.data);
+    } catch (err) {
+      console.error("[ChamadaTurma] error loading linked participants:", err);
+      setLinkedParticipants([]);
+    } finally {
+      setLoadingParticipants(false);
+    }
+  }, [classId]);
+
   const openOrLoadSession = useCallback(async () => {
     if (!classId) return;
     setOpening(true);
@@ -83,6 +107,12 @@ export function ChamadaTurma() {
         `/classes/${classId}/sessions/${res.data.id}`
       );
       const data = sessionRes.data;
+      console.log("[ChamadaTurma] session response:", {
+        classId,
+        sessionId: data.id,
+        selectedDate,
+        members: data.members.length,
+      });
       setSession(data);
 
       const initial: Record<string, StatusKey> = {};
@@ -199,6 +229,11 @@ export function ChamadaTurma() {
   }, [classId, loadClass]);
 
   useEffect(() => {
+    if (!classId) return;
+    loadLinkedParticipants();
+  }, [classId, loadLinkedParticipants]);
+
+  useEffect(() => {
     if (classId && sessionId) {
       loadExistingSession();
     }
@@ -207,9 +242,9 @@ export function ChamadaTurma() {
   if (loading) return <div className="loading">Carregando...</div>;
   if (!classInfo) return <div className="error">Turma não encontrada.</div>;
 
-  const members = session?.members ?? [];
+  const members = session?.members ?? linkedParticipants;
   const filteredMembers = members.filter((m) =>
-    m.fullName.toLowerCase().includes(search.toLowerCase())
+    (m.fullName ?? m.name ?? "").toLowerCase().includes(search.toLowerCase())
   );
 
   const formatSessionDate = (d: string) => {
@@ -234,7 +269,7 @@ export function ChamadaTurma() {
           </span>
         )}
         {classInfo.responsible && (
-          <span>{classInfo.responsible.fullName}</span>
+          <span>{classInfo.responsible?.name ?? ""}</span>
         )}
       </div>
 
@@ -308,7 +343,7 @@ export function ChamadaTurma() {
                 const status = statusMap[m.id] ?? "ausente";
                 return (
                   <div key={m.id} className="participant-row">
-                    <span className="participant-name">{m.fullName}</span>
+                    <span className="participant-name">{m.fullName ?? m.name ?? ""}</span>
                     <div className="attendance-buttons">
                       <button
                         type="button"
@@ -330,7 +365,7 @@ export function ChamadaTurma() {
                         onClick={() =>
                           setJustifiedModal({
                             participantId: m.id,
-                            participantName: m.fullName,
+                            participantName: m.fullName ?? m.name ?? "",
                           })
                         }
                       >
@@ -368,7 +403,7 @@ export function ChamadaTurma() {
           </>
         )}
 
-        {!session && members.length === 0 && (
+        {!session && !loadingParticipants && linkedParticipants.length === 0 && (
           <p className="empty">
             Esta turma não possui participantes vinculados. Vincule participantes na página da turma antes de fazer a chamada.
           </p>

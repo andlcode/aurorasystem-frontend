@@ -1,13 +1,14 @@
 import { useEffect, useState } from "react";
 import { Link, useParams, useNavigate } from "react-router-dom";
 import { api } from "../api/client";
+import { WORKER_ROLE_OPTIONS, type UserRole } from "../types/auth";
 
 interface TeamMember {
   id: string;
-  fullName: string;
+  name: string;
   email: string | null;
   status: string;
-  worker?: { role: string; function: string };
+  role: string;
 }
 
 export function EquipeEditar() {
@@ -18,11 +19,10 @@ export function EquipeEditar() {
   const [error, setError] = useState<string | null>(null);
   const [member, setMember] = useState<TeamMember | null>(null);
   const [form, setForm] = useState({
-    fullName: "",
+    name: "",
     email: "",
     status: "active" as "active" | "inactive",
-    function: "",
-    role: "worker" as "worker" | "evangelizador" | "super_admin",
+    role: "EVANGELIZADOR" as UserRole,
   });
 
   useEffect(() => {
@@ -32,11 +32,11 @@ export function EquipeEditar() {
       .then((res) => {
         setMember(res.data);
         setForm({
-          fullName: res.data.fullName,
+          name: res.data.name,
           email: res.data.email ?? "",
           status: res.data.status as "active" | "inactive",
           function: res.data.worker?.function ?? "",
-          role: (res.data.worker?.role ?? "worker") as "worker" | "evangelizador" | "super_admin",
+          role: (res.data.worker?.role ?? "EVANGELIZADOR") as UserRole,
         });
       })
       .catch((err) => setError(err.response?.data?.error ?? err.message))
@@ -50,11 +50,10 @@ export function EquipeEditar() {
     setError(null);
     try {
       await api.patch(`/team/${id}`, {
-        fullName: form.fullName,
+        fullName: form.name,
         email: form.email || null,
         status: form.status,
-        function: form.function,
-        ...(form.role !== "super_admin" && { role: form.role }),
+        role: form.role,
       });
       navigate("/equipe", { state: { successMessage: "Membro atualizado com sucesso." } });
     } catch (err: unknown) {
@@ -83,8 +82,8 @@ export function EquipeEditar() {
           Nome completo *
           <input
             type="text"
-            value={form.fullName}
-            onChange={(e) => setForm((f) => ({ ...f, fullName: e.target.value }))}
+            value={form.name}
+            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
             required
             placeholder="Nome completo"
           />
@@ -111,31 +110,21 @@ export function EquipeEditar() {
           </select>
         </label>
         <label>
-          Função *
-          <input
-            type="text"
-            value={form.function}
-            onChange={(e) => setForm((f) => ({ ...f, function: e.target.value }))}
-            required
-            placeholder="Ex: Evangelizador, Coordenador"
-          />
-        </label>
-        <label>
           Role
           <select
             value={form.role}
             onChange={(e) =>
               setForm((f) => ({
                 ...f,
-                role: e.target.value as "worker" | "evangelizador" | "super_admin",
+                role: e.target.value as UserRole,
               }))
             }
           >
-            <option value="worker">Trabalhador</option>
-            <option value="evangelizador">Evangelizador</option>
-            {member.worker?.role === "super_admin" && (
-              <option value="super_admin">Super Admin</option>
-            )}
+            {WORKER_ROLE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </label>
 

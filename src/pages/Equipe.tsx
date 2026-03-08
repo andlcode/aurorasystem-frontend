@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { api } from "../api/client";
+import { WORKER_ROLE_LABELS } from "../types/auth";
 
 interface TeamMember {
   id: string;
@@ -55,12 +56,6 @@ export function Equipe() {
     });
   };
 
-  const roleLabel: Record<string, string> = {
-    super_admin: "Super Admin",
-    evangelizador: "Evangelizador",
-    worker: "Trabalhador",
-  };
-
   const statusLabel: Record<string, string> = {
     active: "Ativo",
     inactive: "Inativo",
@@ -109,11 +104,11 @@ export function Equipe() {
           <tbody>
             {members.map((m) => (
               <tr key={m.id}>
-                <td>{m.fullName}</td>
+                <td>{m.name}</td>
                 <td>{m.email ?? "—"}</td>
                 <td>
                   <span className="badge">
-                    {m.worker ? roleLabel[m.worker.role] ?? m.worker.role : "—"}
+                    {m.worker ? WORKER_ROLE_LABELS[m.worker.role as keyof typeof WORKER_ROLE_LABELS] ?? m.worker.role : "—"}
                   </span>
                 </td>
                 <td>

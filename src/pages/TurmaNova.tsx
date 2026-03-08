@@ -2,12 +2,13 @@ import { useEffect, useState } from "react";
 import { Link, Navigate, useNavigate } from "react-router-dom";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
+import { WORKER_ROLE_LABELS, type UserRole } from "../types/auth";
 
 interface Responsavel {
   id: string;
   name: string;
   email?: string | null;
-  role: "evangelizador" | "super_admin" | "moderador" | null;
+  role: UserRole | null;
 }
 
 const DAY_NAMES = [
@@ -34,7 +35,7 @@ export function TurmaNova() {
 
   useEffect(() => {
     api
-      .get<Responsavel[]>("/people/responsaveis")
+      .get<Responsavel[]>("/classes/responsibles")
       .then((res) => {
         console.log("[TurmaNova] Responsáveis carregados:", res.data);
         setResponsibles(res.data);
@@ -46,7 +47,7 @@ export function TurmaNova() {
       .finally(() => setLoadingResponsibles(false));
   }, []);
 
-  if (user?.role !== "super_admin") {
+  if (user?.role !== "SUPER_ADMIN" && user?.role !== "COORDENADOR") {
     return <Navigate to="/turmas" replace />;
   }
 
@@ -65,8 +66,8 @@ export function TurmaNova() {
       return;
     }
     const selected = responsibles.find((r) => r.id === responsibleId);
-    if (selected && !["evangelizador", "super_admin", "moderador"].includes(selected.role ?? "")) {
-      setError("O responsável deve ser um evangelizador, super_admin ou moderador.");
+    if (selected && !["SUPER_ADMIN", "COORDENADOR", "EVANGELIZADOR"].includes(selected.role ?? "")) {
+      setError("O responsável deve ser super admin, coordenador ou evangelizador.");
       return;
     }
 
@@ -135,6 +136,7 @@ export function TurmaNova() {
             {responsibles.map((r) => (
                 <option key={r.id} value={r.id}>
                   {r.name}
+                  {r.role ? ` - ${WORKER_ROLE_LABELS[r.role]}` : ""}
                 </option>
               ))}
           </select>

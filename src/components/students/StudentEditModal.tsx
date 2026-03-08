@@ -51,7 +51,7 @@ export function StudentEditModal({
 
   return (
     <div className="modal-overlay" role="presentation">
-      <form className="modal" onSubmit={handleSubmit}>
+      <form className="modal student-edit-modal" onSubmit={handleSubmit}>
         <h3>Editar aluno</h3>
 
         <label>

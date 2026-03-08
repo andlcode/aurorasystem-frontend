@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api } from "../api/client";
+import { WORKER_ROLE_OPTIONS, type UserRole } from "../types/auth";
 
 export function EquipeNovo() {
   const navigate = useNavigate();
@@ -12,7 +13,7 @@ export function EquipeNovo() {
     username: "",
     password: "",
     function: "",
-    role: "worker" as "worker" | "evangelizador",
+    role: "EVANGELIZADOR" as UserRole,
   });
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -81,25 +82,18 @@ export function EquipeNovo() {
           />
         </label>
         <label>
-          Função *
-          <input
-            type="text"
-            value={form.function}
-            onChange={(e) => setForm((f) => ({ ...f, function: e.target.value }))}
-            required
-            placeholder="Ex: Evangelizador, Coordenador"
-          />
-        </label>
-        <label>
           Role
           <select
             value={form.role}
             onChange={(e) =>
-              setForm((f) => ({ ...f, role: e.target.value as "worker" | "evangelizador" }))
+              setForm((f) => ({ ...f, role: e.target.value as UserRole }))
             }
           >
-            <option value="worker">Trabalhador</option>
-            <option value="evangelizador">Evangelizador</option>
+            {WORKER_ROLE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
           </select>
         </label>
 
