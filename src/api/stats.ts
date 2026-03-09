@@ -151,3 +151,46 @@ export async function getMonthlyAttendanceStudentById(
   );
   return response.data;
 }
+
+// --- Estatísticas agrupadas por turma (compactas) ---
+
+export interface ClassMonthlyStudentItem {
+  participantId: string;
+  name: string;
+  summary: {
+    totalPresent: number;
+    totalAbsent: number;
+    attendanceRate: number;
+    consecutiveAbsences: number;
+  };
+  monthly: Array<{
+    month: string;
+    label: string;
+    present: number;
+    absent: number;
+  }>;
+}
+
+export interface ClassMonthlyAttendanceItem {
+  classId: string;
+  className: string;
+  availableMonths: Array<{ month: string; label: string }>;
+  summary: {
+    studentCount: number;
+    attendanceRate: number;
+    totalPresent: number;
+    totalAbsent: number;
+  };
+  students: ClassMonthlyStudentItem[];
+}
+
+export async function getMonthlyAttendanceByClasses(filters: MonthlyAttendanceQuery = {}) {
+  const params = Object.fromEntries(
+    Object.entries(filters).filter(([, value]) => value != null && value !== "")
+  );
+  const response = await api.get<ClassMonthlyAttendanceItem[]>(
+    "/stats/attendance/classes/monthly",
+    { params }
+  );
+  return response.data;
+}

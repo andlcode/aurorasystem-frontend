@@ -1,17 +1,14 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { Navigate, useLocation } from "react-router-dom";
+import { useCallback, useEffect, useState } from "react";
+import { Navigate } from "react-router-dom";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import {
-  getMonthlyAttendanceStudents,
-  getMonthlyAttendanceStudentById,
+  getMonthlyAttendanceByClasses,
   getStatisticsDashboard,
-  type MonthlyAttendanceStudentOverview,
-  type MonthlyAttendanceStudentDetail,
+  type ClassMonthlyAttendanceItem,
 } from "../api/stats";
 import { StatsFilters, type StatsFiltersState } from "../components/statistics/StatsFilters";
-import { StudentAttendanceCard } from "../components/statistics/StudentAttendanceCard";
-import { StudentAttendanceDetail } from "../components/statistics/StudentAttendanceDetail";
+import { ClassStatsBlock } from "../components/statistics/ClassStatsBlock";
 import { SummaryCard } from "../components/dashboard/SummaryCard";
 import type { DashboardResponse } from "../types/dashboard";
 
@@ -35,16 +32,11 @@ const percentFormatter = new Intl.NumberFormat("pt-BR", {
 
 export function Estatisticas() {
   const { user } = useAuth();
-  const location = useLocation();
-  const initialStudentId = (location.state as { selectedStudentId?: string })?.selectedStudentId ?? null;
 
   const [filters, setFilters] = useState<StatsFiltersState>(DEFAULT_FILTERS);
   const [classOptions, setClassOptions] = useState<ClassOption[]>([]);
-  const [students, setStudents] = useState<MonthlyAttendanceStudentOverview[]>([]);
-  const [selectedStudentId, setSelectedStudentId] = useState<string | null>(initialStudentId);
-  const [studentDetail, setStudentDetail] = useState<MonthlyAttendanceStudentDetail | null>(null);
+  const [classesData, setClassesData] = useState<ClassMonthlyAttendanceItem[]>([]);
   const [loading, setLoading] = useState(true);
-  const [detailLoading, setDetailLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showAggregate, setShowAggregate] = useState(false);
   const [aggregateData, setAggregateData] = useState<DashboardResponse | null>(null);
@@ -61,59 +53,30 @@ export function Estatisticas() {
       .catch(() => setClassOptions([]));
   }, []);
 
-  const loadStudents = useCallback(async () => {
+  const loadData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getMonthlyAttendanceStudents({
+      const data = await getMonthlyAttendanceByClasses({
         classId: filters.classId ?? undefined,
         startDate: filters.from ?? undefined,
         endDate: filters.to ?? undefined,
         status: "active",
         q: filters.search.trim() || undefined,
       });
-      setStudents(data);
+      setClassesData(data);
     } catch (err) {
-      console.error("[Estatisticas] Erro ao carregar estatísticas mensais:", err);
+      console.error("[Estatisticas] Erro ao carregar estatísticas:", err);
       setError("Não foi possível carregar as estatísticas.");
-      setStudents([]);
+      setClassesData([]);
     } finally {
       setLoading(false);
     }
   }, [filters.classId, filters.from, filters.to, filters.search]);
 
   useEffect(() => {
-    loadStudents();
-  }, [loadStudents]);
-
-  useEffect(() => {
-    if (!selectedStudentId) {
-      setStudentDetail(null);
-      return;
-    }
-    let active = true;
-    setDetailLoading(true);
-    getMonthlyAttendanceStudentById(selectedStudentId, {
-      classId: filters.classId ?? undefined,
-      startDate: filters.from ?? undefined,
-      endDate: filters.to ?? undefined,
-      status: "active",
-    })
-      .then((detail) => {
-        if (active) setStudentDetail(detail);
-      })
-      .catch(() => {
-        if (active) setStudentDetail(null);
-      })
-      .finally(() => {
-        if (active) setDetailLoading(false);
-      });
-    return () => {
-      active = false;
-    };
-  }, [selectedStudentId, filters.classId, filters.from, filters.to]);
-
-  const filteredStudents = useMemo(() => students, [students]);
+    loadData();
+  }, [loadData]);
 
   const handleResetFilters = useCallback(() => {
     setFilters(DEFAULT_FILTERS);
@@ -141,13 +104,15 @@ export function Estatisticas() {
     }
   }, [showAggregate, loadAggregate]);
 
+  const isEmpty = !loading && !error && classesData.length === 0;
+
   return (
     <div className="page statistics-page">
       <div className="page-header statistics-page__header">
         <div>
           <h1>Estatísticas</h1>
           <p className="muted statistics-page__subtitle">
-            Evolução mensal de presença por aluno. Filtre por turma e período.
+            Presença por turma. Apenas meses com chamadas registradas. P = presenças, F = faltas, FC = faltas consecutivas.
           </p>
         </div>
       </div>
@@ -171,45 +136,28 @@ export function Estatisticas() {
         </div>
       )}
 
-      {!loading && !error && filteredStudents.length === 0 && (
+      {!loading && !error && isEmpty && (
         <div className="empty">
           Nenhum dado de presença encontrado para os filtros selecionados.
         </div>
       )}
 
-      {!loading && !error && filteredStudents.length > 0 && (
-        <section className="statistics-main">
-          <h2 className="visually-hidden">Visão mensal por aluno</h2>
-          <div className="statistics-students-list">
-            {filteredStudents.map((student) => (
-              <StudentAttendanceCard
-                key={student.participantId}
-                student={student}
-                isSelected={selectedStudentId === student.participantId}
-                onClick={() =>
-                  setSelectedStudentId(
-                    selectedStudentId === student.participantId ? null : student.participantId
-                  )
-                }
+      {!loading && !error && !isEmpty && (
+        <section className="statistics-main statistics-main--compact">
+          <h2 className="visually-hidden">Estatísticas por turma</h2>
+          <div className="statistics-classes-list">
+            {classesData.map((classData) => (
+              <ClassStatsBlock
+                key={classData.classId}
+                classData={classData}
+                filters={{
+                  classId: filters.classId ?? undefined,
+                  from: filters.from ?? undefined,
+                  to: filters.to ?? undefined,
+                }}
               />
             ))}
           </div>
-
-          {selectedStudentId && (
-            <>
-              {detailLoading && (
-                <div className="loading" role="status">
-                  Carregando detalhes...
-                </div>
-              )}
-              {!detailLoading && studentDetail && (
-                <StudentAttendanceDetail
-                  detail={studentDetail}
-                  onClose={() => setSelectedStudentId(null)}
-                />
-              )}
-            </>
-          )}
 
           <details
             className="statistics-aggregate-section"
@@ -217,7 +165,7 @@ export function Estatisticas() {
             onToggle={(e) => setShowAggregate((e.target as HTMLDetailsElement).open)}
           >
             <summary className="statistics-aggregate-summary">
-              Ver estatísticas agregadas (por turma, mês, etc.)
+              Ver estatísticas agregadas
             </summary>
             {showAggregate && (
               <>
