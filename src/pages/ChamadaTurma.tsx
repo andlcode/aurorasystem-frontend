@@ -172,6 +172,8 @@ export function ChamadaTurma() {
     if (!session || !classId) return;
     setSaving(true);
     setError(null);
+    setSuccessMessage(null);
+    const isUpdate = session.items.length > 0;
     try {
       const records = session.members.map((m) => ({
         participantId: m.id,
@@ -182,7 +184,7 @@ export function ChamadaTurma() {
         records,
       });
       setSuccessMessage(
-        session.items.length > 0 ? "Chamada atualizada com sucesso" : "Chamada salva com sucesso"
+        isUpdate ? "Chamada atualizada com sucesso." : "Chamada salva com sucesso."
       );
       const sessionRes = await api.get<SessionData>(
         `/classes/${classId}/sessions/${session.id}`
@@ -192,7 +194,8 @@ export function ChamadaTurma() {
     } catch (err: unknown) {
       const msg =
         (err as { response?: { data?: { error?: string } } })?.response?.data
-          ?.error ?? "Erro ao salvar chamada";
+          ?.error ??
+        (isUpdate ? "Não foi possível atualizar a chamada." : "Não foi possível salvar a chamada.");
       setError(msg);
     } finally {
       setSaving(false);

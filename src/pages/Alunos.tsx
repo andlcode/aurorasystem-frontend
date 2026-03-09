@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { Link, Navigate, useLocation } from "react-router-dom";
 import { api } from "../api/client";
+import { getStatsStudents, type StudentStatsSummary } from "../api/stats";
 import { StudentClassModal } from "../components/students/StudentClassModal";
 import { StudentEditModal } from "../components/students/StudentEditModal";
 import { useAuth } from "../context/AuthContext";
@@ -63,6 +64,7 @@ export function Alunos() {
   const [pendingDelete, setPendingDelete] = useState<Person | null>(null);
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [attendanceStatsMap, setAttendanceStatsMap] = useState<Record<string, StudentStatsSummary["summary"]>>({});
   const canManageStudents = user?.role === "SUPER_ADMIN" || user?.role === "COORDENADOR";
 
   useEffect(() => {
@@ -101,6 +103,33 @@ export function Alunos() {
   useEffect(() => {
     loadAlunos();
   }, [loadAlunos]);
+
+  useEffect(() => {
+    if (alunos.length === 0) {
+      setAttendanceStatsMap({});
+      return;
+    }
+    let active = true;
+    getStatsStudents({
+      participantIds: alunos.map((a) => a.id).join(","),
+      status: "all",
+    })
+      .then((list) => {
+        if (active) {
+          const map: Record<string, StudentStatsSummary["summary"]> = {};
+          for (const s of list) {
+            map[s.participantId] = s.summary;
+          }
+          setAttendanceStatsMap(map);
+        }
+      })
+      .catch(() => {
+        if (active) setAttendanceStatsMap({});
+      });
+    return () => {
+      active = false;
+    };
+  }, [alunos]);
 
   const updateAlunoInList = useCallback((updated: Person) => {
     setAlunos((current) =>
@@ -458,6 +487,27 @@ export function Alunos() {
               </div>
             )}
 
+            {attendanceStatsMap[a.id] && (
+              <div className="student-quick-card__section student-quick-card__attendance">
+                <span className="student-quick-card__label">Presença</span>
+                <div className="student-attendance-stats">
+                  <span title="Percentual de presença">
+                    {attendanceStatsMap[a.id].totalSessions > 0
+                      ? `${Math.round(attendanceStatsMap[a.id].attendanceRate)}%`
+                      : "—"}
+                  </span>
+                  {attendanceStatsMap[a.id].consecutiveAbsences > 0 && (
+                    <span
+                      className="student-attendance-stats__consecutive"
+                      title="Faltas consecutivas"
+                    >
+                      {attendanceStatsMap[a.id].consecutiveAbsences} falta(s) consecutiva(s)
+                    </span>
+                  )}
+                </div>
+              </div>
+            )}
+
             <div className="student-quick-card__section">
               <span className="student-quick-card__label">Turmas</span>
               {a.classes.length > 0 ? (
@@ -484,6 +534,14 @@ export function Alunos() {
 
             {canManageStudents && (
               <div className="student-quick-card__actions">
+                <Link
+                  to="/estatisticas"
+                  state={{ selectedStudentId: a.id }}
+                  className="student-inline-action"
+                >
+                  Estatísticas
+                </Link>
+                <span className="student-quick-card__separator">|</span>
                 <button
                   type="button"
                   className="student-inline-action"

@@ -64,6 +64,9 @@ export function TurmaDetalhe() {
   const [loading, setLoading] = useState(true);
   const [opening, setOpening] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [attendanceError, setAttendanceError] = useState<string | null>(null);
+  const [updatingAttendanceId, setUpdatingAttendanceId] = useState<string | null>(null);
   const [justifiedModal, setJustifiedModal] = useState<{
     participantId: string;
     participantName: string;
@@ -150,6 +153,9 @@ export function TurmaDetalhe() {
   const updateAttendance = useCallback(
     async (participantId: string, status: "present" | "absent" | "justified", justificationReason?: string) => {
       if (!session) return;
+      setUpdatingAttendanceId(participantId);
+      setAttendanceError(null);
+      setSuccessMessage(null);
       try {
         await api.put(`/sessions/${session.id}/attendance`, {
           participantId,
@@ -162,8 +168,15 @@ export function TurmaDetalhe() {
           `/sessions/${session.id}/attendance`
         );
         setAttendance(res.data);
-      } catch (err) {
-        console.error("Erro ao atualizar presença:", err);
+        setSuccessMessage("Presença atualizada com sucesso.");
+        setTimeout(() => setSuccessMessage(null), 4000);
+      } catch (err: unknown) {
+        const msg =
+          (err as { response?: { data?: { error?: string } } })?.response?.data?.error ??
+          "Não foi possível atualizar a chamada.";
+        setAttendanceError(msg);
+      } finally {
+        setUpdatingAttendanceId(null);
       }
     },
     [session]
@@ -215,6 +228,12 @@ export function TurmaDetalhe() {
         {(class_.owner ?? class_.responsible)?.name ?? ""}
       </div>
 
+      {successMessage && (
+        <div className="success-banner" role="alert">
+          {successMessage}
+        </div>
+      )}
+
       <section className="section">
         <h2>Participantes vinculados</h2>
         {participants.length > 0 ? (
@@ -259,6 +278,11 @@ export function TurmaDetalhe() {
             </button>
           </div>
           {error && <p className="error-inline">{error}</p>}
+          {attendanceError && (
+            <p className="error-inline" role="alert">
+              {attendanceError}
+            </p>
+          )}
         </div>
 
         {session && (
@@ -297,22 +321,25 @@ export function TurmaDetalhe() {
                         type="button"
                         className={`btn btn-sm ${status === "present" ? "btn-primary" : "btn-ghost"}`}
                         onClick={() => updateAttendance(m.id, "present")}
+                        disabled={updatingAttendanceId === m.id}
                       >
-                        Presente
+                        {updatingAttendanceId === m.id ? "..." : "Presente"}
                       </button>
                       <button
                         type="button"
                         className={`btn btn-sm ${status === "absent" ? "btn-absent" : "btn-ghost"}`}
                         onClick={() => updateAttendance(m.id, "absent")}
+                        disabled={updatingAttendanceId === m.id}
                       >
-                        Falta
+                        {updatingAttendanceId === m.id ? "..." : "Falta"}
                       </button>
                       <button
                         type="button"
                         className={`btn btn-sm ${status === "justified" ? "btn-justified" : "btn-ghost"}`}
                         onClick={() => handleJustifiedClick(m.id, m.fullName ?? m.name ?? "")}
+                        disabled={updatingAttendanceId === m.id}
                       >
-                        Justificada
+                        {updatingAttendanceId === m.id ? "..." : "Justificada"}
                       </button>
                     </div>
                   </div>

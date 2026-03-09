@@ -165,6 +165,7 @@ export function ChamadaRapida() {
 
     setSaving(true);
     setError(null);
+    setSuccessMessage(null);
 
     try {
       await api.put(`/classes/${classId}/sessions/${session.id}/attendance`, {
@@ -179,12 +180,12 @@ export function ChamadaRapida() {
         })),
       });
 
-      setSuccessMessage("Chamada finalizada com sucesso.");
-      setTimeout(() => setSuccessMessage(null), 3500);
+      setSuccessMessage("Chamada salva com sucesso.");
+      setTimeout(() => setSuccessMessage(null), 5000);
     } catch (err: unknown) {
       const msg =
         (err as { response?: { data?: { error?: string } } })?.response?.data?.error ??
-        "Erro ao finalizar a chamada.";
+        "Não foi possível salvar a chamada.";
       setError(msg);
     } finally {
       setSaving(false);

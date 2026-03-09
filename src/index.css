@@ -980,6 +980,113 @@ a:hover {
   font-weight: 700;
 }
 
+.statistics-student-filters {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.statistics-student-filters .search-input,
+.statistics-student-filters select {
+  max-width: 100%;
+}
+
+.statistics-student-detail {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--color-border);
+}
+
+.statistics-student-detail h3 {
+  margin: 0 0 0.25rem;
+  font-size: 1.125rem;
+}
+
+.statistics-student-summary {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 1rem;
+  margin: 1rem 0;
+}
+
+.statistics-student-summary__item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.statistics-student-summary__label {
+  font-size: 0.8125rem;
+  color: var(--color-text-muted);
+}
+
+.statistics-student-bar {
+  height: 8px;
+  background: var(--color-border);
+  border-radius: var(--radius);
+  overflow: hidden;
+  margin: 1rem 0;
+}
+
+.statistics-student-bar__fill {
+  height: 100%;
+  border-radius: var(--radius);
+  transition: width 0.3s ease;
+}
+
+.statistics-student-bar__fill--present {
+  background: var(--color-success);
+}
+
+.statistics-student-history {
+  margin-top: 1rem;
+}
+
+.statistics-student-history h4 {
+  margin: 0 0 0.75rem;
+  font-size: 0.9375rem;
+}
+
+.statistics-rankings-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+}
+
+.statistics-rankings-grid h4 {
+  margin: 0 0 0.5rem;
+  font-size: 0.9375rem;
+}
+
+.statistics-ranking-simple {
+  margin: 0;
+  padding-left: 1.25rem;
+}
+
+.statistics-ranking-simple li {
+  margin-bottom: 0.35rem;
+  font-size: 0.875rem;
+}
+
+.badge.present {
+  background: rgba(22, 163, 74, 0.12);
+  color: var(--color-success);
+}
+
+.badge.absent {
+  background: rgba(220, 38, 38, 0.12);
+  color: var(--color-error);
+}
+
+.badge.justified {
+  background: rgba(234, 179, 8, 0.12);
+  color: #b45309;
+}
+
 .donut-chart {
   display: grid;
   grid-template-columns: minmax(180px, 240px) 1fr;
@@ -1753,9 +1860,18 @@ h2 {
 .student-quick-card__label {
   font-size: 0.75rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-  color: var(--color-text-muted);
+}
+
+.student-attendance-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem 1rem;
+  font-size: 0.875rem;
+}
+
+.student-attendance-stats__consecutive {
+  color: var(--color-error);
+  font-weight: 500;
 }
 
 .student-quick-card__empty {
