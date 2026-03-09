@@ -75,3 +75,79 @@ export async function getStatsStudentById(
   });
   return response.data;
 }
+
+// --- Estatísticas mensais por aluno ---
+
+export interface MonthlyAttendanceItem {
+  month: string;
+  label: string;
+  present: number;
+  absent: number;
+  total: number;
+  attendanceRate: number;
+}
+
+export interface MonthlyAttendanceSummary {
+  totalPresent: number;
+  totalAbsent: number;
+  totalSessions: number;
+  attendanceRate: number;
+  consecutiveAbsences: number;
+  lastPresentAt: string | null;
+  lastAbsentAt: string | null;
+}
+
+export interface MonthlyAttendanceStudentOverview {
+  participantId: string;
+  name: string;
+  classIds: string[];
+  classNames: string[];
+  summary: MonthlyAttendanceSummary;
+  monthly: MonthlyAttendanceItem[];
+}
+
+export interface MonthlyAttendanceHistoryItem {
+  sessionId: string;
+  sessionDate: string;
+  classId: string;
+  className: string;
+  status: "present" | "absent" | "justified";
+}
+
+export interface MonthlyAttendanceStudentDetail extends MonthlyAttendanceStudentOverview {
+  history: MonthlyAttendanceHistoryItem[];
+}
+
+export interface MonthlyAttendanceQuery {
+  classId?: string;
+  participantId?: string;
+  startDate?: string;
+  endDate?: string;
+  status?: "all" | "active" | "inactive";
+  q?: string;
+}
+
+export async function getMonthlyAttendanceStudents(filters: MonthlyAttendanceQuery = {}) {
+  const params = Object.fromEntries(
+    Object.entries(filters).filter(([, value]) => value != null && value !== "")
+  );
+  const response = await api.get<MonthlyAttendanceStudentOverview[]>(
+    "/stats/attendance/students/monthly",
+    { params }
+  );
+  return response.data;
+}
+
+export async function getMonthlyAttendanceStudentById(
+  participantId: string,
+  filters?: Omit<MonthlyAttendanceQuery, "participantId">
+) {
+  const params = Object.fromEntries(
+    Object.entries(filters ?? {}).filter(([, value]) => value != null && value !== "")
+  );
+  const response = await api.get<MonthlyAttendanceStudentDetail>(
+    `/stats/attendance/students/${participantId}/monthly`,
+    { params }
+  );
+  return response.data;
+}
