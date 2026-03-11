@@ -5,8 +5,6 @@ interface ClassOption {
 
 export interface StatsFiltersState {
   classId: string | null;
-  from: string | null;
-  to: string | null;
   search: string;
 }
 
@@ -15,6 +13,7 @@ interface StatsFiltersProps {
   classOptions: ClassOption[];
   onChange: (next: StatsFiltersState) => void;
   onReset: () => void;
+  showAllClassesOption?: boolean;
 }
 
 export function StatsFilters({
@@ -22,13 +21,14 @@ export function StatsFilters({
   classOptions,
   onChange,
   onReset,
+  showAllClassesOption = true,
 }: StatsFiltersProps) {
   return (
     <section className="card statistics-filters statistics-filters--compact">
       <div className="statistics-filters__header">
         <div>
           <h2>Filtros</h2>
-          <p className="muted">Turma, período e busca por aluno.</p>
+          <p className="muted">Turma e busca por aluno.</p>
         </div>
         <button type="button" className="btn btn-ghost" onClick={onReset}>
           Limpar filtros
@@ -52,31 +52,13 @@ export function StatsFilters({
             value={filters.classId ?? ""}
             onChange={(e) => onChange({ ...filters, classId: e.target.value || null })}
           >
-            <option value="">Todas as turmas</option>
+            {showAllClassesOption && <option value="">Todas as turmas</option>}
             {classOptions.map((opt) => (
               <option key={opt.id} value={opt.id}>
                 {opt.name}
               </option>
             ))}
           </select>
-        </label>
-
-        <label className="statistics-filters__field">
-          <span>Data inicial</span>
-          <input
-            type="date"
-            value={filters.from ?? ""}
-            onChange={(e) => onChange({ ...filters, from: e.target.value || null })}
-          />
-        </label>
-
-        <label className="statistics-filters__field">
-          <span>Data final</span>
-          <input
-            type="date"
-            value={filters.to ?? ""}
-            onChange={(e) => onChange({ ...filters, to: e.target.value || null })}
-          />
         </label>
       </div>
     </section>

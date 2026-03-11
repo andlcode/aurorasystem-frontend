@@ -194,3 +194,47 @@ export async function getMonthlyAttendanceByClasses(filters: MonthlyAttendanceQu
   );
   return response.data;
 }
+
+// --- Diário escolar (presença por data) ---
+
+export interface ClassDiaryMonthItem {
+  month: string;
+  label: string;
+  dates: string[];
+}
+
+export interface ClassDiaryStudentItem {
+  participantId: string;
+  name: string;
+  summary: {
+    totalPresent: number;
+    totalAbsent: number;
+    attendanceRate: number;
+    consecutiveAbsences: number;
+  };
+  attendanceByDate: Record<string, "present" | "absent" | "justified">;
+}
+
+export interface ClassDiaryItem {
+  classId: string;
+  className: string;
+  summary: {
+    studentCount: number;
+    attendanceRate: number;
+    totalPresent: number;
+    totalAbsent: number;
+  };
+  months: ClassDiaryMonthItem[];
+  students: ClassDiaryStudentItem[];
+}
+
+export async function getDiaryAttendanceByClasses(filters: MonthlyAttendanceQuery = {}) {
+  const params = Object.fromEntries(
+    Object.entries(filters).filter(([, value]) => value != null && value !== "")
+  );
+  const response = await api.get<ClassDiaryItem[]>(
+    "/stats/attendance/classes/daily",
+    { params }
+  );
+  return Array.isArray(response?.data) ? response.data : [];
+}

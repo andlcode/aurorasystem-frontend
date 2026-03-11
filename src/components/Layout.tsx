@@ -10,6 +10,10 @@ export function Layout() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const canManagePeople = user?.role === "SUPER_ADMIN" || user?.role === "COORDENADOR";
   const canManageTeam = user?.role === "SUPER_ADMIN";
+  const canViewStats =
+    user?.role === "SUPER_ADMIN" ||
+    user?.role === "COORDENADOR" ||
+    user?.role === "EVANGELIZADOR";
 
   const handleLogout = () => {
     logout();
@@ -22,12 +26,12 @@ export function Layout() {
 
   const navItems = useMemo(
     () => [
-      canManagePeople ? { to: "/estatisticas", label: "Estatísticas" } : null,
+      canViewStats ? { to: "/estatisticas", label: "Estatísticas" } : null,
       { to: "/turmas", label: "Turmas" },
       canManagePeople ? { to: "/alunos", label: "Alunos" } : null,
       canManageTeam ? { to: "/equipe", label: "Equipe" } : null,
     ].filter((item): item is { to: string; label: string } => item !== null),
-    [canManagePeople, canManageTeam]
+    [canManagePeople, canManageTeam, canViewStats]
   );
 
   const roleLabel = user?.role

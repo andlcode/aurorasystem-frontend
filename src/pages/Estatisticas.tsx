@@ -3,12 +3,12 @@ import { Navigate } from "react-router-dom";
 import { api } from "../api/client";
 import { useAuth } from "../context/AuthContext";
 import {
-  getMonthlyAttendanceByClasses,
+  getDiaryAttendanceByClasses,
   getStatisticsDashboard,
-  type ClassMonthlyAttendanceItem,
 } from "../api/stats";
+import { mapApiToAttendanceMatrix } from "../utils/attendanceMatrix";
 import { StatsFilters, type StatsFiltersState } from "../components/statistics/StatsFilters";
-import { ClassStatsBlock } from "../components/statistics/ClassStatsBlock";
+import { ClassDiaryCard } from "../components/statistics/ClassDiaryCard";
 import { SummaryCard } from "../components/dashboard/SummaryCard";
 import type { DashboardResponse } from "../types/dashboard";
 
@@ -19,8 +19,6 @@ interface ClassOption {
 
 const DEFAULT_FILTERS: StatsFiltersState = {
   classId: null,
-  from: null,
-  to: null,
   search: "",
 };
 
@@ -35,36 +33,50 @@ export function Estatisticas() {
 
   const [filters, setFilters] = useState<StatsFiltersState>(DEFAULT_FILTERS);
   const [classOptions, setClassOptions] = useState<ClassOption[]>([]);
-  const [classesData, setClassesData] = useState<ClassMonthlyAttendanceItem[]>([]);
+  const [classesData, setClassesData] = useState<
+    ReturnType<typeof mapApiToAttendanceMatrix>
+  >([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showAggregate, setShowAggregate] = useState(false);
   const [aggregateData, setAggregateData] = useState<DashboardResponse | null>(null);
   const [aggregateLoading, setAggregateLoading] = useState(false);
 
-  if (user?.role !== "SUPER_ADMIN" && user?.role !== "COORDENADOR") {
+  const isEvangelizador = user?.role === "EVANGELIZADOR";
+  const canViewAllClasses = user?.role === "SUPER_ADMIN" || user?.role === "COORDENADOR";
+
+  if (
+    user &&
+    user.role !== "SUPER_ADMIN" &&
+    user.role !== "COORDENADOR" &&
+    user.role !== "EVANGELIZADOR"
+  ) {
     return <Navigate to="/dashboard" replace />;
   }
 
   useEffect(() => {
     api
       .get<ClassOption[]>("/classes")
-      .then((res) => setClassOptions(res.data.map((c) => ({ id: c.id, name: c.name }))))
+      .then((res) => {
+        const classes = res.data.map((c) => ({ id: c.id, name: c.name }));
+        setClassOptions(classes);
+        if (isEvangelizador && classes.length === 1) {
+          setFilters((prev) => ({ ...prev, classId: classes[0].id }));
+        }
+      })
       .catch(() => setClassOptions([]));
-  }, []);
+  }, [isEvangelizador]);
 
   const loadData = useCallback(async () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await getMonthlyAttendanceByClasses({
+      const apiData = await getDiaryAttendanceByClasses({
         classId: filters.classId ?? undefined,
-        startDate: filters.from ?? undefined,
-        endDate: filters.to ?? undefined,
         status: "active",
         q: filters.search.trim() || undefined,
       });
-      setClassesData(data);
+      setClassesData(mapApiToAttendanceMatrix(apiData));
     } catch (err) {
       console.error("[Estatisticas] Erro ao carregar estatísticas:", err);
       setError("Não foi possível carregar as estatísticas.");
@@ -72,22 +84,24 @@ export function Estatisticas() {
     } finally {
       setLoading(false);
     }
-  }, [filters.classId, filters.from, filters.to, filters.search]);
+  }, [filters.classId, filters.search]);
 
   useEffect(() => {
     loadData();
   }, [loadData]);
 
   const handleResetFilters = useCallback(() => {
-    setFilters(DEFAULT_FILTERS);
-  }, []);
+    if (isEvangelizador && classOptions.length === 1) {
+      setFilters({ ...DEFAULT_FILTERS, classId: classOptions[0].id });
+    } else {
+      setFilters(DEFAULT_FILTERS);
+    }
+  }, [isEvangelizador, classOptions]);
 
   const loadAggregate = useCallback(async () => {
     setAggregateLoading(true);
     try {
       const data = await getStatisticsDashboard({
-        from: filters.from ?? undefined,
-        to: filters.to ?? undefined,
         classId: filters.classId ?? undefined,
       });
       setAggregateData(data);
@@ -96,7 +110,7 @@ export function Estatisticas() {
     } finally {
       setAggregateLoading(false);
     }
-  }, [filters.from, filters.to, filters.classId]);
+  }, [filters.classId]);
 
   useEffect(() => {
     if (showAggregate) {
@@ -112,7 +126,7 @@ export function Estatisticas() {
         <div>
           <h1>Estatísticas</h1>
           <p className="muted statistics-page__subtitle">
-            Presença por turma. Apenas meses com chamadas registradas. P = presenças, F = faltas, FC = faltas consecutivas.
+            Diário de presença por turma. ✓ presente · ✗ falta · P = presenças · F = faltas · FC = faltas consecutivas.
           </p>
         </div>
       </div>
@@ -122,6 +136,7 @@ export function Estatisticas() {
         classOptions={classOptions}
         onChange={setFilters}
         onReset={handleResetFilters}
+        showAllClassesOption={canViewAllClasses}
       />
 
       {loading && (
@@ -147,15 +162,7 @@ export function Estatisticas() {
           <h2 className="visually-hidden">Estatísticas por turma</h2>
           <div className="statistics-classes-list">
             {classesData.map((classData) => (
-              <ClassStatsBlock
-                key={classData.classId}
-                classData={classData}
-                filters={{
-                  classId: filters.classId ?? undefined,
-                  from: filters.from ?? undefined,
-                  to: filters.to ?? undefined,
-                }}
-              />
+              <ClassDiaryCard key={classData.classId} classData={classData} />
             ))}
           </div>
 
